@@ -20,7 +20,8 @@
             "input": "apps/movie-theater/public"
           }
         ],
-        "styles": ["apps/movie-theater/src/styles.css"]
+        "styles": ["apps/movie-theater/src/styles.css"],
+        "webWorkerTsConfig": "apps/movie-theater/tsconfig.worker.json"
       },
       "configurations": {
         "production": {
@@ -50,6 +51,9 @@
         "^production",
         {
           "runtime": "tsx tools/download-media.ts --fingerprint"
+        },
+        {
+          "runtime": "tsx tools/download-onnx.ts --fingerprint"
         }
       ]
     },
@@ -83,7 +87,7 @@
       "dependsOn": ["build"]
     },
     "test": {
-      "command": "tsx --test apps/movie-theater/src/app/core/*.test.ts",
+      "command": "tsx --test 'apps/movie-theater/src/app/**/*.test.ts'",
       "dependsOn": ["^build"],
       "cache": true
     },

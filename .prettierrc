@@ -1,3 +1,11 @@
 {
-  "singleQuote": true
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "apps/movie-theater/**/*.html",
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
 }

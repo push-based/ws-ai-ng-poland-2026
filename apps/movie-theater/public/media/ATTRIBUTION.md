@@ -3,7 +3,7 @@
 These files are excerpts and derived stills of Blender open-movie productions, not public-domain assets.
 The app shows attribution under the player. This file travels with the built media.
 The film audio remains part of its film excerpt; no separately distributed soundtrack file is used.
-Workshop caption tracks are newly authored programme commentary, not official dialogue transcripts.
+Dialogue subtitles are separately sourced and attributed in [subtitle provenance](../../../../../docs/SUBTITLES.md).
 
 | Files                      | Attribution                                                                           | License                                                   | Changes                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |

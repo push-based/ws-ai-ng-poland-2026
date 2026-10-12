@@ -1,0 +1,162 @@
+<aside
+  #panel
+  class="inspector"
+  role="dialog"
+  aria-modal="true"
+  aria-label="AI Inspector"
+  tabindex="-1"
+  (keydown.escape)="dismiss.emit()"
+>
+  <div class="inspector-header">
+    <div>
+      <span class="eyebrow">UNDER THE HOOD</span>
+      <h2><svg lucideCpu></svg> AI Inspector</h2>
+    </div>
+    <button (click)="dismiss.emit()" aria-label="Close AI Inspector">
+      <svg lucideX></svg>
+    </button>
+  </div>
+  <div class="inspector-tabs">
+    @for (item of tabs; track item) {
+      <button [class.active]="tab() === item" (click)="tab.set(item)">
+        {{ item }}
+      </button>
+    }
+  </div>
+  <div class="inspector-body">
+    @if (tab() === 'Setup') {
+      <p class="micro">{{ userAgent }}</p>
+      <p class="intro">
+        Inspect capabilities before creating a model. A JavaScript global alone
+        does not prove your device can run the requested task.
+      </p>
+      <div class="mode">
+        <label
+          >Execution mode<select
+            [value]="runtime.mode()"
+            (change)="mode($event)"
+            [disabled]="runtime.busy()"
+          >
+            <option value="native">Native browser AI</option>
+            <option value="fixture">Demo fixtures</option>
+          </select></label
+        >
+      </div>
+      <p class="micro">
+        Fixtures are deterministic examples. Native mode never silently falls
+        back.
+      </p>
+      <div class="actions">
+        <button class="button secondary small" (click)="capabilities.check()">
+          Check capabilities</button
+        ><button
+          class="button primary small"
+          (click)="prepare()"
+          [disabled]="runtime.busy()"
+        >
+          Prepare Prompt model
+        </button>
+      </div>
+      @if (runtime.busy()) {
+        <p class="micro">
+          Preparing / processing… {{ percent(runtime.progress()) }}% downloaded
+          <button (click)="runtime.stop()">Cancel</button>
+        </p>
+      }
+      @for (api of capabilities.capabilities(); track api.name) {
+        <div class="capability">
+          <div>
+            <strong>{{ api.name }}</strong>
+            <p>{{ api.detail }}</p>
+          </div>
+          <span [class.ready]="api.state === 'available'">{{ api.state }}</span>
+        </div>
+      }
+      <div class="setup-note">
+        <strong
+          >WebMCP:
+          {{ tools.registered() ? 'registered' : 'not registered' }}</strong
+        >
+        <p>
+          Local Chrome setup: enable
+          <code>chrome://flags/#enable-webmcp-testing</code>, relaunch, then
+          register tools from the projection booth.
+        </p>
+        <p>
+          The app and media need no remote service. Native model downloads need
+          connectivity and an eligible desktop device. Prepare models before
+          testing offline.
+        </p>
+        <p>
+          “Zero token cost” means no cloud per-token inference bill for local
+          execution. Tokens, device compute and downloads still exist.
+        </p>
+      </div>
+      <label class="detector"
+        >Language detection<input
+          [value]="sample()"
+          (input)="sample.set(value($event))"
+          placeholder="Szukam dobrego filmu na wieczór" /></label
+      ><button
+        class="button secondary small"
+        (click)="detect()"
+        [disabled]="runtime.busy() || !sample().trim()"
+      >
+        Detect text language
+      </button>
+      @if (detected(); as detected) {
+        <pre>{{ detected | json }}</pre>
+        <p class="micro">
+          Short inputs may be ambiguous. Detection does not choose your viewing
+          language.
+        </p>
+      }
+    }
+    @if (tab() === 'API trace') {
+      <p class="intro">
+        Calls and configuration from this session. Generated text is rendered as
+        text, never executable HTML.
+      </p>
+      @for (trace of runtime.traces(); track $index) {
+        <article class="trace">
+          <span>{{ trace.time }} · {{ trace.api }}</span>
+          <h3>{{ trace.operation }}</h3>
+          <pre>{{ trace.detail }}</pre>
+        </article>
+      } @empty {
+        <p class="micro">Use an AI feature to see its calls here.</p>
+      }
+    }
+    @if (tab() === 'Tools') {
+      <p class="intro">
+        WebMCP exposes page operations. The companion MCP server exposes
+        catalogue tools, resources and prompts over stdio. A calling agent may
+        have its own costs.
+      </p>
+      @if (tools.discovered().length) {
+        <details>
+          <summary>
+            Native browser discovery · {{ tools.discovered().length }} tools
+          </summary>
+          <pre>{{ tools.discovered() | json }}</pre>
+        </details>
+      }
+      @for (tool of tools.tools; track tool.name) {
+        <details>
+          <summary>{{ tool.name }}</summary>
+          <p>{{ tool.description }}</p>
+          <pre>{{ tool.inputSchema | json }}</pre>
+        </details>
+      }
+      <div class="setup-note">
+        <strong>MCP companion</strong>
+        <p>Build: <code>pnpm nx build cinema-mcp</code></p>
+        <p>Host command: <code>node apps/cinema-mcp/dist/main.js</code></p>
+        <p>
+          Tool: search_movies<br />Resources: cinema://movies/:id<br />Prompt:
+          film_club_discussion
+        </p>
+      </div>
+    }
+  </div>
+</aside>

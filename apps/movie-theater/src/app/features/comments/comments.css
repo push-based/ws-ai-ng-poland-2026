@@ -1,0 +1,139 @@
+.comments {
+  padding: 28px;
+  margin-top: 0;
+}
+.intro {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.comment-count {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+form > label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 20px 0 8px;
+}
+textarea {
+  width: 100%;
+  background: #0f1315;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 14px;
+  resize: vertical;
+  line-height: 1.7;
+}
+.draft-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 8px;
+}
+.draft-meta > span:last-child {
+  white-space: nowrap;
+}
+.assistance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 18px 0;
+}
+.assistance button {
+  border: 1px solid var(--line);
+  background: #252a2d;
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--text);
+}
+.assistance button span {
+  color: var(--amber);
+  font-size: 8px;
+  margin-left: 8px;
+}
+.assistance select {
+  font-size: 11px;
+}
+.suggestion {
+  padding: 18px;
+  background: #edbe7008;
+  border: 1px solid #edbe7028;
+  border-radius: 9px;
+  margin: 18px 0;
+}
+.suggestion p {
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.suggestion > div {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.discard {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 18px 0;
+}
+.saved {
+  color: #b5d2b6;
+  font-size: 11px;
+}
+.storage-error {
+  font-size: 12px;
+  color: #ffc7a6;
+  line-height: 1.7;
+}
+.comment-list {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.comment-list article {
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+.comment-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.comment-list strong {
+  font-size: 12px;
+}
+.comment-list time {
+  font-size: 10px;
+  color: var(--muted);
+}
+.comment-list article p {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 0;
+}
+.empty {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comment-list {
+  max-height: 300px;
+  overflow: auto;
+}

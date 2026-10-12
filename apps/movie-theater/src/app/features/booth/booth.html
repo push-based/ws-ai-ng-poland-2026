@@ -1,0 +1,155 @@
+<section class="booth panel">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">THE PROJECTION BOOTH</span>
+      <h2><svg lucideAudioLines></svg> Sound, shaped by you.</h2>
+    </div>
+    <span class="api-chip">Web Audio + WebMCP</span>
+  </div>
+  <p class="intro">
+    A real audio graph. Human hands or structured tools. The same controls.
+  </p>
+  <div class="spectrum">
+    <div class="spectrum-label">
+      <span><svg lucideRadio></svg> LIVE FREQUENCY SPECTRUM</span
+      ><span>{{
+        cinema.audio.active()
+          ? 'AUDIO CONNECTED'
+          : 'PRESS PLAY TO CONNECT
+        AUDIO'
+      }}</span>
+    </div>
+    <canvas
+      #spectrum
+      width="700"
+      height="150"
+      aria-label="Live audio frequency spectrum"
+    ></canvas>
+    <div class="frequencies">
+      <span>20 Hz</span><span>250 Hz</span><span>1 kHz</span><span>4 kHz</span
+      ><span>20 kHz</span>
+    </div>
+  </div>
+  <div class="mixer">
+    @for (band of bands; track band.key) {
+      <div class="channel">
+        <span class="band-name">{{ band.label }}</span
+        ><span class="band-frequency">{{ band.frequency }}</span>
+        <div class="fader">
+          <div class="ticks">
+            <span>+12</span><span>0</span><span>−12</span>
+          </div>
+          <input
+            type="range"
+            min="-12"
+            max="12"
+            step="1"
+            [value]="cinema.audio.mix()[band.key]"
+            (input)="mix(band.key, $event)"
+            [attr.aria-label]="band.label + ' gain in decibels'"
+          />
+        </div>
+        <output
+          >{{ cinema.audio.mix()[band.key] > 0 ? '+' : ''
+          }}{{ cinema.audio.mix()[band.key] }} <small>dB</small></output
+        >
+      </div>
+    }
+    <div class="channel master">
+      <span class="band-name">MASTER</span
+      ><span class="band-frequency">OUTPUT LEVEL</span>
+      <div class="fader">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          [value]="cinema.audio.mix().volume"
+          (input)="mix('volume', $event)"
+          aria-label="Master volume"
+        />
+      </div>
+      <output>{{ volume() }} <small>%</small></output>
+    </div>
+  </div>
+  <div class="presets">
+    <span class="micro">LISTENING PRESETS</span>
+    @for (preset of presets; track preset.key) {
+      <button (click)="cinema.audio.preset(preset.key)">
+        {{ preset.label }}
+      </button>
+    }
+    <button
+      class="reset"
+      (click)="cinema.audio.preset('flat')"
+      aria-label="Reset audio mix"
+    >
+      <svg lucideRotateCcw></svg>
+    </button>
+  </div>
+  <div class="agent">
+    <div>
+      <span class="eyebrow">AGENT-READY, BY DESIGN</span>
+      <h3><svg lucideTerminal></svg> Give the booth a direction.</h3>
+    </div>
+    <p>
+      Expose meaningful operations with an input schema. An external WebMCP
+      agent can apply the mix and see the same state you do.
+    </p>
+    <label class="micro"
+      ><input
+        type="checkbox"
+        [checked]="native()"
+        (change)="native.set(!native())"
+        [disabled]="!tools.nativeExecution()"
+      />
+      Execute through native WebMCP discovery + execution</label
+    >
+    <div class="tool-examples">
+      <button (click)="example('dialogue')">“Make the dialogue clearer”</button
+      ><button (click)="example('night')">“Set a quiet night mix”</button
+      ><button (click)="example('state')">Read screening state</button
+      ><button (click)="example('invalid')">Test invalid bass: 99 dB</button>
+    </div>
+    <p class="micro">
+      {{
+        native()
+          ? 'These buttons discover and execute the registered browser
+      tools. They do not run an agent model.'
+          : 'These buttons call local
+      handlers directly; they do not simulate an agent or prove WebMCP
+      transport.'
+      }}
+    </p>
+    <button
+      class="button secondary small"
+      (click)="tools.register()"
+      [disabled]="tools.registered()"
+    >
+      {{
+        tools.registered()
+          ? 'Tools registered with WebMCP'
+          : 'Register native
+      WebMCP tools'
+      }}
+    </button>
+    @if (tools.error()) {
+      <p class="micro">{{ tools.error() }}</p>
+    }
+    @if (feedback()) {
+      <p class="feedback" aria-live="polite">{{ feedback() }}</p>
+    }
+  </div>
+  @if (tools.log().length) {
+    <details>
+      <summary>Tool execution log</summary>
+      @for (call of tools.log(); track $index) {
+        <div class="tool-log">
+          <code>{{ call.name }}</code>
+          <pre>{{ call.args }}</pre>
+          <pre>{{ call.result }}</pre>
+        </div>
+      }
+    </details>
+  }
+</section>

@@ -1,271 +1,72 @@
-<div [attr.inert]="lens() ? '' : null">
+<div [attr.inert]="inspectorOpen() ? '' : null">
   <a class="skip-link" href="#main">Skip to cinema</a>
   <header class="topbar">
-    <button
-      class="brand"
-      (click)="cinema.view.set('discover')"
-      aria-label="Nano Cinema home"
+    <a class="brand" routerLink="/" aria-label="Nano Cinema home"
+      ><span class="brand-mark"><svg lucideFilm></svg></span
+      ><span>NANO<span class="brand-light">CINEMA</span></span></a
+    ><button
+      #inspectorButton
+      class="inspector-toggle"
+      (click)="inspector.show()"
     >
-      <span class="brand-mark"><svg lucideFilm></svg></span
-      ><span>NANO<span class="brand-light">CINEMA</span></span>
-    </button>
-    <nav aria-label="Cinema sections">
-      <button
-        [class.active]="cinema.view()==='discover'"
-        (click)="cinema.view.set('discover')"
-      >
-        Discover</button
-      ><button
-        [class.active]="cinema.view()==='screening'"
-        (click)="cinema.view.set('screening')"
-      >
-        Screening room</button
-      ><button
-        [class.active]="cinema.view()==='booth'"
-        (click)="cinema.view.set('booth')"
-      >
-        Projection booth
-      </button>
-    </nav>
-    <button class="lens-toggle" #lensButton (click)="lens.set(true)">
-      <svg lucideCpu></svg><span>Workshop Lens</span><span class="key">↗</span>
+      <svg lucideCpu></svg><span>AI Inspector</span><span class="key">↗</span>
     </button>
   </header>
   <div class="runtime">
     <span class="runtime-message"
-      ><span class="status-dot" [class.fixture]="ai.mode()==='fixture'"></span
-      >{{ai.mode()==='native'?'NATIVE BROWSER AI':'WORKSHOP FIXTURES'}}<span
-        class="runtime-detail"
-        >{{ai.mode()==='native'?'Models run on your device when
-        available':'Deterministic examples · no native inference'}}</span
+      ><span
+        class="status-dot"
+        [class.fixture]="runtime.mode() === 'fixture'"
       ></span
+      >{{ runtime.mode() === 'native' ? 'NATIVE BROWSER AI' : 'DEMO FIXTURES'
+      }}<span class="runtime-detail">{{
+        runtime.mode() === 'native'
+          ? 'Models run on your device when available'
+          : 'Deterministic examples · no native inference'
+      }}</span></span
     >
     <div class="runtime-controls">
       <label class="sr-only" for="runtime-mode">Execution mode</label
       ><select
         id="runtime-mode"
-        [value]="ai.mode()"
+        [value]="runtime.mode()"
         (change)="switchMode($event)"
-        [disabled]="ai.busy()"
+        [disabled]="runtime.busy()"
       >
         <option value="native">Native AI</option>
         <option value="fixture">Fixtures</option></select
       ><button
         (click)="reset()"
-        [disabled]="ai.busy()"
-        aria-label="Reset workshop demo"
+        [disabled]="runtime.busy()"
+        aria-label="Reset demo"
       >
         <svg lucideRotateCcw></svg><span>Reset demo</span>
       </button>
     </div>
   </div>
-  @if(ai.error()) {
-  <div class="global-error" role="alert">
-    {{ai.error()}} <button (click)="lens.set(true)">Open setup</button>
-  </div>
-  }
-  <main id="main">
-    @if(cinema.view()==='discover'){
-    <section class="hero">
-      <img
-        class="hero-image"
-        src="media/sintel.jpg"
-        alt="An atmospheric frame from the Sintel trailer"
-      />
-      <div class="hero-shade"></div>
-      <div class="hero-content">
-        <div class="hero-kicker">
-          <span class="live-dot"></span> THE OPEN MOVIE COLLECTION
-          <span>/ 01</span>
-        </div>
-        <h1>Small films.<br /><em>Big possibilities.</em></h1>
-        <p>
-          Your own little cinema. Powered by your browser.<br />Find a story,
-          cross a language, shape the sound.
-        </p>
-        <div class="hero-actions">
-          <button
-            class="button primary"
-            (click)="watch('sintel')"
-            [disabled]="ai.busy()"
-          >
-            <svg lucidePlay></svg> Take your seat</button
-          ><button class="button glass" (click)="lens.set(true)">
-            Explore the technology <svg lucideArrowUpRight></svg>
-          </button>
-        </div>
-        <div class="hero-film">
-          <span>FEATURED SHORT</span><strong>Sintel</strong
-          ><span>2010 · Fantasy · 30s excerpt</span>
-        </div>
-      </div>
-      <div class="hero-number">LOCAL STORIES.<br />LOCAL INTELLIGENCE.</div>
-    </section>
-    <section class="collection">
-      <div class="collection-heading">
-        <div>
-          <span class="eyebrow">THREE WORLDS. ONE SCREEN.</span>
-          <h2>Tonight’s programme<span>.</span></h2>
-        </div>
-        <span class="collection-count"
-          >{{films().length.toString().padStart(2,'0')}} FILMS / ALL LOCAL</span
-        >
-      </div>
-      <form
-        class="search"
-        toolname="search_catalogue"
-        tooldescription="Search the local movie catalogue by title, genre, mood and spoken audio language. No audio means a film without spoken dialogue."
-        (submit)="search($event)"
-      >
-        <label class="sr-only" for="catalogue-query">Search movies</label
-        ><input
-          id="catalogue-query"
-          name="query"
-          [value]="model().query"
-          (input)="setQuery($event)"
-          toolparamdescription="Movie title, genre or mood"
-          placeholder="Search a title, genre, or mood…"
-        /><label class="sr-only" for="audio-language"
-          >Spoken audio language</label
-        ><select
-          id="audio-language"
-          name="language"
-          [value]="model().language"
-          (change)="setLanguage($event)"
-          toolparamdescription="Spoken audio language, or none for no dialogue"
-        >
-          <option value="">All audio languages</option>
-          <option value="en">English dialogue</option>
-          <option value="none">No spoken dialogue</option></select
-        ><button class="button secondary small">Find films</button>
-      </form>
-      <div class="films">
-        @for(movie of films();track movie.id){<button
-          class="film-card"
-          (click)="watch(movie.id)"
-          [disabled]="ai.busy()"
-        >
-          <div class="film-art">
-            <img
-              [src]="'media/'+movie.id+'.jpg'"
-              [alt]="movie.title+' film still'"
-            /><span class="film-index">0{{$index+1}}</span
-            ><span class="film-duration">30 SEC</span
-            ><span class="film-play"><svg lucidePlay></svg></span>
-          </div>
-          <div class="film-info">
-            <div class="film-topline">
-              <span>{{movie.genre}}</span><span>{{movie.year}}</span>
-            </div>
-            <h3>{{movie.title}}<svg lucideArrowUpRight></svg></h3>
-            <p>{{movie.mood}}</p>
-          </div></button
-        >}@empty{
-        <p class="empty">
-          No matching film. Try “fantasy”, “comedy”, or “sci-fi”.
-        </p>
-        }
-      </div>
-    </section>
-    <section class="discover-bottom">
-      <app-cinema-concierge />
-      <div class="why panel">
-        <span class="eyebrow">A CINEMA WITH A DIFFERENCE</span>
-        <h2>The magic happens<br /><em>right here.</em></h2>
-        <p>
-          A browser-managed model picks your film. Local language models
-          translate your captions. Structured tools operate the projection
-          booth.
-        </p>
-        <div class="why-item">
-          <svg lucideSparkles></svg>
-          <div>
-            <strong>Find your next story</strong
-            ><span>Prompt + Summarizer</span>
-          </div>
-        </div>
-        <div class="why-item">
-          <svg lucideFilm></svg>
-          <div>
-            <strong>Cross a language</strong
-            ><span>Language Detector + Translator</span>
-          </div>
-        </div>
-        <div class="why-item">
-          <svg lucideSlidersHorizontal></svg>
-          <div>
-            <strong>Take control of the booth</strong
-            ><span>Web Audio + WebMCP</span>
-          </div>
-        </div>
-        <button class="text-link" (click)="lens.set(true)">
-          See how it all connects <svg lucideArrowUpRight></svg>
-        </button>
-      </div>
-    </section>
-    }
-    <div [hidden]="cinema.view()==='discover'" class="theater">
-      <div class="theater-heading">
-        <button class="back" (click)="cinema.view.set('discover')">
-          <svg lucideArrowLeft></svg> Back to programme</button
-        ><span class="eyebrow"
-          >{{cinema.view()==='booth'?'LISTEN DIFFERENTLY':'MAKE YOURSELF AT
-          HOME'}}</span
-        >
-      </div>
-      <div class="theater-grid">
-        <div class="screen-column">
-          <app-cinema-player />
-          <div class="screen-nav">
-            <button
-              (click)="cinema.view.set('screening')"
-              [class.active]="cinema.view()==='screening'"
-            >
-              Film notes</button
-            ><button
-              (click)="cinema.view.set('booth')"
-              [class.active]="cinema.view()==='booth'"
-            >
-              Projection booth
-            </button>
-          </div>
-          <div [hidden]="cinema.view()!=='screening'">
-            <app-cinema-notes /><app-cinema-writing />
-          </div>
-        </div>
-        <aside class="side-column">
-          <div [hidden]="cinema.view()!=='screening'">
-            <app-cinema-concierge />
-          </div>
-          <div [hidden]="cinema.view()!=='booth'"><app-cinema-booth /></div>
-          <div class="screening-tip">
-            <span class="eyebrow">WORKSHOP NOTE</span>
-            <p>
-              {{cinema.view()==='booth'?'Play the clip once to unlock audio.
-              Then move a fader or invoke a tool: both change the same audio
-              graph.':'Pause the clip and describe a frame. Translate the
-              commentary captions. Compare a summary with its source notes.'}}
-            </p>
-          </div>
-        </aside>
-      </div>
+  @if (runtime.error()) {
+    <div class="global-error" role="alert">
+      {{ runtime.error()
+      }}<button (click)="inspector.show()">Open setup</button>
     </div>
-  </main>
+  }
+  <main id="main"><router-outlet /></main>
   <footer>
     <div class="footer-brand"><svg lucideFilm></svg> NANO CINEMA</div>
-    <p>
-      Built for AI Poland 2026 · Angular 22 · Open movies, open possibilities.
-    </p>
-    <button (click)="lens.set(true)">Local AI. No cloud inference bill.*</button
+    <p>Open movies. Local intelligence.</p>
+    <button (click)="inspector.show()">
+      Local AI. No cloud inference bill.*</button
     ><span class="footnote"
       >*For native on-device inference. Initial downloads and device resources
       still apply.</span
     >
   </footer>
 </div>
-@if(lens()){<button
-  class="lens-backdrop"
-  (click)="closeLens()"
-  aria-label="Close Workshop Lens"
-></button
-><app-workshop-lens (dismiss)="closeLens()" />}
+@if (inspectorOpen()) {
+  <button
+    class="inspector-backdrop"
+    (click)="closeInspector()"
+    aria-label="Close AI Inspector"
+  ></button
+  ><app-ai-inspector (dismiss)="closeInspector()" />
+}

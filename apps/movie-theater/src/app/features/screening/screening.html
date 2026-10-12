@@ -1,0 +1,36 @@
+@if (movie()) {
+  <section class="theater">
+    <div class="theater-heading">
+      <a class="back" routerLink="/"
+        ><svg lucideArrowLeft></svg> Back to programme</a
+      ><span class="eyebrow">MAKE YOURSELF AT HOME</span>
+    </div>
+    <div class="theater-grid">
+      <div class="screen-column"><app-cinema-player /></div>
+      <aside class="side-column" aria-label="Movie details and controls">
+        <nav class="sidebar-tabs" aria-label="Movie panels">
+          @for (tab of tabs; track tab.id) {
+            <button
+              [class.active]="panel() === tab.id"
+              [attr.aria-pressed]="panel() === tab.id"
+              (click)="selectPanel(tab.id)"
+            >
+              {{ tab.label }}
+            </button>
+          }
+        </nav>
+        <!-- Keep panel state alive while hiding inactive panels; drafts and summaries survive tab changes. -->
+        <div [hidden]="panel() !== 'story'"><app-cinema-notes /></div>
+        <div [hidden]="panel() !== 'comments'"><app-movie-comments /></div>
+        <div [hidden]="panel() !== 'sound'"><app-cinema-booth /></div>
+      </aside>
+    </div>
+  </section>
+} @else {
+  <section class="not-found panel">
+    <span class="eyebrow">THE SCREEN IS EMPTY</span>
+    <h1>Movie not found.</h1>
+    <p>Choose one of the films in our programme.</p>
+    <a class="button primary" routerLink="/">Back to programme</a>
+  </section>
+}

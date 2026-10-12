@@ -1,0 +1,115 @@
+<section class="concierge panel">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">YOUR PERSONAL PROGRAMMER</span>
+      <h2><svg lucideSparkles></svg> A little help choosing?</h2>
+    </div>
+    <span class="api-chip">Prompt API</span>
+  </div>
+  <p>Tell us the mood. We’ll find your next small escape.</p>
+  <div class="suggestions">
+    @for (suggestion of suggestions; track suggestion) {
+      <button
+        type="button"
+        (click)="ask(suggestion)"
+        [disabled]="runtime.busy()"
+      >
+        {{ suggestion }}
+      </button>
+    }
+  </div>
+  <form (submit)="submit($event)">
+    <label class="sr-only" [for]="requestId">Your movie preferences</label
+    ><input
+      [id]="requestId"
+      [formField]="requestForm.request"
+      placeholder="Something atmospheric, with a little adventure…"
+      autocomplete="off"
+    /><button
+      class="send"
+      aria-label="Find a movie"
+      [disabled]="runtime.busy() || requestForm().invalid()"
+    >
+      <svg lucideArrowUp></svg>
+    </button>
+  </form>
+  @if (runtime.busy()) {
+    <div class="working">
+      <span class="status-dot"></span>
+      {{
+        runtime.mode() === 'fixture'
+          ? 'Demo fixture running'
+          : 'Local AI task
+    running'
+      }}
+      <button (click)="runtime.stop()">Stop</button>
+    </div>
+  }
+  @if (runtime.streamed() && runtime.busy()) {
+    <p class="stream" aria-live="polite">{{ runtime.streamed() }}</p>
+  }
+  @if (result(); as recommendation) {
+    <div class="recommendation" aria-live="polite">
+      <span class="eyebrow">OUR PICK FOR YOU</span>
+      <h3>{{ title(recommendation.movieId) }}</h3>
+      <p>{{ recommendation.reason }}</p>
+      <button
+        class="button primary small"
+        (click)="watch(recommendation.movieId)"
+        [disabled]="runtime.busy()"
+      >
+        Enter screening room
+      </button>
+    </div>
+  }
+  @if (conversation.detected(); as detected) {
+    <p class="micro">
+      Request language: {{ detected.language }} ·
+      {{ percent(detected.confidence) }}% confidence. Subtitle language stays
+      your choice.
+    </p>
+  }
+  <label class="micro"
+    >Request language
+    <select
+      [value]="requestLanguage()"
+      (change)="requestLanguage.set(languageValue($event))"
+      [disabled]="runtime.busy()"
+    >
+      <option value="">Detect automatically</option>
+      <option value="en">English</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select></label
+  >
+  <p class="micro">Override detection for short or ambiguous requests.</p>
+  <div class="context">
+    <div>
+      <span>Session context</span
+      ><span
+        >{{ conversation.contextUsage() }} /
+        {{ conversation.contextWindow() || '—' }} tokens
+        {{ runtime.mode() === 'fixture' ? '(simulated)' : '' }}</span
+      >
+    </div>
+    <progress
+      [value]="conversation.contextPercent()"
+      max="100"
+      aria-label="Session context usage"
+    ></progress>
+    <div class="context-actions">
+      <button (click)="run(conversation.clone())" [disabled]="runtime.busy()">
+        Fork session</button
+      ><button
+        (click)="run(conversation.compact())"
+        [disabled]="runtime.busy() || !conversation.history().length"
+      >
+        Compact history</button
+      ><button (click)="reset()" [disabled]="runtime.busy()">
+        <svg lucideRotateCcw></svg> Reset
+      </button>
+    </div>
+  </div>
+</section>

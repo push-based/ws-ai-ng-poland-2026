@@ -1,0 +1,70 @@
+<section class="detection-controls">
+  <div class="detection-heading">
+    <div>
+      <strong>Object detection</strong><span>Optional · on-device</span>
+    </div>
+    <button class="button secondary small" (click)="toggle()">
+      {{ detector.enabled() ? 'Disable detection' : 'Enable detection' }}
+    </button>
+  </div>
+  @if (detector.enabled()) {
+    @if (detector.ready()) {
+      <div class="detector-status">
+        <span class="api-chip"
+          >YOLOX-Nano · 3.5 MB · {{ detector.backend() }}</span
+        ><span
+          >{{ detector.milliseconds() }} ms ·
+          {{ detector.boxes().length }} detections</span
+        >
+      </div>
+      <div class="detector-options">
+        <button
+          class="button secondary small"
+          (click)="scanFrame()"
+          [disabled]="detector.busy()"
+        >
+          Scan this frame</button
+        ><label
+          ><input
+            type="checkbox"
+            [checked]="peopleOnly()"
+            (change)="setPeople($event)"
+          />
+          People only</label
+        ><label
+          ><input
+            type="checkbox"
+            [checked]="detector.tracking()"
+            (change)="setTracking($event)"
+            [disabled]="detector.backend() !== 'WebGPU'"
+          />
+          Live tracking</label
+        ><label class="confidence"
+          >Confidence {{ threshold()
+          }}<input
+            type="range"
+            min="0.1"
+            max="0.8"
+            step="0.05"
+            [value]="threshold()"
+            (input)="setThreshold($event)"
+            aria-label="Detection confidence threshold"
+        /></label>
+      </div>
+      <p class="micro">
+        Manual scans pause the video. Live tracking runs at most once per second
+        on WebGPU. Animated characters can produce weak or empty detections.
+      </p>
+    } @else {
+      <p class="micro">
+        Loading the optional model and runtime… You can disable it at any time.
+      </p>
+    }
+  }
+  @if (detector.error()) {
+    <p class="error" role="alert">{{ detector.error() }}</p>
+  }
+  @if (detector.note() && detector.enabled()) {
+    <p class="micro">{{ detector.note() }}</p>
+  }
+</section>

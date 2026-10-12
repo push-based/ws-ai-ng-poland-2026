@@ -1,0 +1,127 @@
+.concierge {
+  padding: 28px;
+}
+.section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-heading h2 svg {
+  color: var(--amber);
+  width: 21px;
+}
+.concierge > p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 12px 0 20px;
+}
+.suggestions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.suggestions button {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+}
+.suggestions button:hover {
+  border-color: var(--amber);
+  color: var(--text);
+}
+form {
+  display: flex;
+  background: #111416;
+  border: 1px solid #3d4145;
+  border-radius: 12px;
+  padding: 6px;
+  gap: 6px;
+}
+input {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 12px;
+  color: var(--text);
+  min-width: 0;
+}
+.send {
+  background: var(--amber);
+  color: #181512;
+  border: 0;
+  border-radius: 8px;
+  width: 42px;
+  flex-shrink: 0;
+}
+.send svg {
+  width: 19px;
+}
+.working {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  margin-top: 15px;
+}
+.working button {
+  margin-left: auto;
+}
+.stream {
+  white-space: pre-wrap;
+}
+.recommendation {
+  border-left: 2px solid var(--amber);
+  padding: 16px 20px;
+  margin: 20px 0;
+  background: #e9af5310;
+}
+.recommendation h3 {
+  font-size: 22px;
+  margin: 7px 0;
+}
+.recommendation p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.context {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.context > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+}
+.context progress {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--amber);
+  margin-top: 10px;
+}
+.context-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 13px;
+}
+.context-actions button,
+.working button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.context-actions svg {
+  width: 12px;
+  height: 12px;
+}

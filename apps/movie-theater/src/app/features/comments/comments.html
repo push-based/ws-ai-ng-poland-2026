@@ -1,0 +1,129 @@
+<section class="panel comments">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">AFTER THE SCREENING</span>
+      <h2>What stayed with you?</h2>
+    </div>
+    <span class="comment-count"
+      >{{ comments().length }}
+      {{ comments().length === 1 ? 'comment' : 'comments' }}</span
+    >
+  </div>
+  <p class="intro">
+    A thought about {{ cinema.movie().title }}, a favourite detail, or a little
+    review. Your comments are saved only in this browser.
+  </p>
+  <form (submit)="post($event)">
+    <label for="movie-comment">Your comment</label
+    ><textarea
+      id="movie-comment"
+      [formField]="draftForm.text"
+      rows="4"
+      placeholder="I loved the atmosphere, especially…"
+      (input)="saved.set(false)"
+    ></textarea>
+    <div class="draft-meta">
+      <span>Start with your own thoughts. AI suggestions are optional.</span
+      ><span>{{ draft().text.length }} / {{ maxLength }}</span>
+    </div>
+    <div class="assistance">
+      <button
+        type="button"
+        (click)="assist('draft')"
+        [disabled]="
+          runtime.busy() || !draft().text.trim() || draftForm().invalid()
+        "
+      >
+        Help me write <span>Writer</span></button
+      ><button
+        type="button"
+        (click)="assist('rewrite')"
+        [disabled]="
+          runtime.busy() || !draft().text.trim() || draftForm().invalid()
+        "
+      >
+        Adjust tone <span>Rewriter</span></button
+      ><label class="sr-only" for="comment-tone">Comment tone</label
+      ><select
+        id="comment-tone"
+        [value]="tone()"
+        (change)="setTone($event)"
+        [disabled]="runtime.busy()"
+      >
+        <option value="more-casual">More casual</option>
+        <option value="more-formal">More formal</option>
+        <option value="as-is">Keep tone</option></select
+      ><button
+        type="button"
+        (click)="assist('proofread')"
+        [disabled]="
+          runtime.busy() || !draft().text.trim() || draftForm().invalid()
+        "
+      >
+        Check spelling <span>Proofreader</span>
+      </button>
+    </div>
+    @if (suggestion()) {
+      <div class="suggestion" aria-live="polite">
+        <span class="eyebrow"
+          >SUGGESTED EDIT ·
+          {{
+            runtime.mode() === 'fixture'
+              ? 'DEMO FIXTURE'
+              : 'ON-DEVICE
+        AI'
+          }}</span
+        >
+        <p>{{ suggestion() }}</p>
+        <div>
+          <button
+            type="button"
+            class="button secondary small"
+            (click)="accept()"
+            [disabled]="runtime.busy()"
+          >
+            Use this version</button
+          ><button type="button" class="discard" (click)="discard()">
+            Keep my draft
+          </button>
+        </div>
+      </div>
+    }
+    @if (draft().text.length > maxLength) {
+      <p class="storage-error" role="alert">
+        Keep the comment within {{ maxLength }} characters.
+      </p>
+    }
+    <div class="post-actions">
+      <button
+        class="button primary"
+        [disabled]="
+          runtime.busy() || draftForm().invalid() || !draft().text.trim()
+        "
+      >
+        Save comment
+      </button>
+      @if (saved()) {
+        <span class="saved" role="status">Saved in this browser.</span>
+      }
+    </div>
+  </form>
+  @if (store.error()) {
+    <p class="storage-error" role="alert">{{ store.error() }}</p>
+  }
+  <div class="comment-list">
+    @for (comment of comments(); track comment.id) {
+      <article>
+        <div>
+          <strong>You</strong
+          ><time [attr.datetime]="comment.createdAt">{{
+            comment.createdAt | date: 'medium'
+          }}</time>
+        </div>
+        <p>{{ comment.text }}</p>
+      </article>
+    } @empty {
+      <p class="empty">No comments yet. Start the conversation.</p>
+    }
+  </div>
+</section>

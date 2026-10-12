@@ -5,7 +5,8 @@ export default [
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: ['**/dist', '**/out-tsc'],
+    // Generated runtime binaries/loaders are copied from the locked vendor package.
+    ignores: ['**/dist', '**/out-tsc', '**/public/models/ort/**', '.cache/**'],
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],

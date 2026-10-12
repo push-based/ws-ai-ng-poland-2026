@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { executeDiscoveredTool, toolMetadata } from './webmcp.js';
+import { executeDiscoveredTool, toolMetadata } from './webmcp/webmcp-client.js';
 test('native object arguments execute once without compatibility retry', async () => {
   let calls = 0;
   const result = await executeDiscoveredTool(

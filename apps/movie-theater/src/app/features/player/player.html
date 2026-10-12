@@ -1,0 +1,160 @@
+<section class="player-area">
+  <div class="screen" #screen>
+    <video
+      #video
+      [src]="'media/' + cinema.movieId() + '.mp4'"
+      [poster]="'media/' + cinema.movieId() + '.jpg'"
+      preload="metadata"
+      playsinline
+      (timeupdate)="updateTime()"
+      (loadedmetadata)="loaded()"
+      (play)="cinema.playing.set(true)"
+      (pause)="cinema.playing.set(false)"
+      (ended)="cinema.playing.set(false)"
+      (error)="
+        mediaError.set(
+          'The local clip could not be loaded. Check the bundled media files.'
+        )
+      "
+    ></video>
+    <div class="detection-layer" aria-hidden="true">
+      @for (box of detector.boxes(); track $index) {
+        <div
+          class="detection-box"
+          [style.left.%]="box.x * 100"
+          [style.top.%]="box.y * 100"
+          [style.width.%]="box.width * 100"
+          [style.height.%]="box.height * 100"
+        >
+          <span>{{ box.label }} {{ score(box.score) }}%</span>
+        </div>
+      }
+    </div>
+    @if (!cinema.playing()) {
+      <button class="screen-play" (click)="toggle()" aria-label="Play excerpt">
+        <svg lucidePlay></svg>
+      </button>
+    }
+    @if (cinema.captionsVisible() && cinema.caption()) {
+      <div class="subtitle">
+        <span>{{ cinema.caption() }}</span>
+      </div>
+    }
+    <span class="screen-label">30 SECOND SCREENING</span>
+  </div>
+  <div class="transport">
+    <button
+      (click)="toggle()"
+      [attr.aria-label]="cinema.playing() ? 'Pause' : 'Play'"
+    >
+      @if (cinema.playing()) {
+        <svg lucidePause></svg>
+      } @else {
+        <svg lucidePlay></svg>
+      }</button
+    ><span class="time">{{ time(cinema.time()) }}</span
+    ><input
+      type="range"
+      min="0"
+      [max]="cinema.duration()"
+      step="0.1"
+      [value]="cinema.time()"
+      (input)="seek($event)"
+      aria-label="Playback position"
+    /><span class="time">{{ time(cinema.duration()) }}</span
+    ><button
+      (click)="cinema.captionsVisible.update(invert)"
+      [attr.aria-pressed]="cinema.captionsVisible()"
+      aria-label="Toggle dialogue subtitles"
+    >
+      <svg lucideCaptions></svg></button
+    ><button (click)="fullscreen()" aria-label="Fullscreen">
+      <svg lucideMaximize></svg>
+    </button>
+  </div>
+  @if (mediaError()) {
+    <p class="error" role="alert">{{ mediaError() }}</p>
+  }
+  <div class="player-meta">
+    <div>
+      <span class="eyebrow">NOW SCREENING · {{ cinema.movie().year }}</span>
+      <h2>{{ cinema.movie().title }}</h2>
+      <p>{{ cinema.movie().genre }} / {{ cinema.movie().director }}</p>
+    </div>
+    <button
+      class="button secondary"
+      (click)="capture()"
+      [disabled]="runtime.busy()"
+    >
+      <svg lucideScanEye></svg> Describe this shot
+    </button>
+  </div>
+  <div class="caption-settings">
+    <div>
+      <span class="api-chip">Translator API</span>
+      <p class="micro">Dialogue subtitles · timings preserved</p>
+    </div>
+    <label
+      >Caption language
+      <select
+        [value]="cinema.subtitleLanguage()"
+        (change)="translate($event)"
+        [disabled]="runtime.busy() || !cinema.movie().captions.length"
+      >
+        <option value="en">English</option>
+        <option value="pl">Polski</option>
+        <option value="de">Deutsch</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+      </select></label
+    >
+  </div>
+  @if (!cinema.movie().captions.length) {
+    <p class="micro">This excerpt has no spoken dialogue.</p>
+  }
+  <details class="caption-comparison">
+    <summary>Compare dialogue subtitles</summary>
+    @for (cue of cinema.movie().captions; track cue.start) {
+      <div class="cue">
+        <span>{{ time(cue.start) }}–{{ time(cue.end) }}</span>
+        <p>{{ cue.text }}</p>
+        @if (cinema.subtitleLanguage() !== 'en') {
+          <p class="translated" [attr.lang]="cinema.subtitleLanguage()">
+            {{ cinema.captionTexts()[$index] }}
+          </p>
+        }
+      </div>
+    }
+  </details>
+  @if (shot()) {
+    <div class="shot panel">
+      <img
+        [src]="shot()"
+        alt="Captured frame sent to the scene-description model"
+      />
+      <div>
+        <span class="api-chip">Prompt API · Image input</span>
+        <p aria-live="polite">
+          {{ description() || 'Describing the captured frame…' }}
+        </p>
+      </div>
+    </div>
+  }
+  <app-detection-controls [video]="videoElement()" />
+  <p class="credits">
+    {{ cinema.movie().credit }} · {{ cinema.movie().license }} · Edited excerpt
+    and derived still.
+    <a [href]="cinema.movie().source" target="_blank" rel="noopener"
+      >Original project</a
+    >
+  </p>
+  @if (cinema.movie().subtitleSource) {
+    <p class="credits">
+      <a [href]="cinema.movie().subtitleSource" target="_blank" rel="noopener"
+        >Subtitle source</a
+      >
+      · {{ cinema.movie().subtitleCredit }} ·
+      {{ cinema.movie().subtitleLicense }}
+    </p>
+  }
+</section>

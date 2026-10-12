@@ -8,3 +8,4 @@ allowBuilds:
   lmdb: false
   msgpackr-extract: false
   '@parcel/watcher': false
+  protobufjs: false

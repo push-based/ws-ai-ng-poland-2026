@@ -3,7 +3,7 @@
 ## Before the workshop
 
 1. Install dependencies, install ffmpeg/ffprobe and unzip, run `pnpm media:download`, then run `pnpm build`, `pnpm lint`, `pnpm test`.
-2. Start the app, open Workshop Lens and check capabilities for the actual device.
+2. Start the app, open AI Inspector and check capabilities for the actual device.
 3. Prepare Prompt and try a native request. Prepare the en → pl Translator by changing caption language, then repeat in native mode to verify it is cached.
 4. Exercise Summarizer, image input and the optional writing APIs independently.
 5. Enable WebMCP in the workshop Chrome profile and verify native tool discovery and calls with the inspector for that build.
@@ -17,12 +17,12 @@
 | Time        | Block             | App path and demonstration                                                                                                                        |
 | ----------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 10:00–10:15 | Opening           | Discover → show the complete film-to-booth flow                                                                                                   |
-| 10:15–11:20 | AI-native browser | Lens → capability matrix, exact options, model preparation, native/fixtures                                                                       |
+| 10:15–11:20 | AI-native browser | Inspector → capability matrix, exact options, model preparation, native/fixtures                                                                  |
 | 11:35–12:50 | Prompt API        | Concierge → stream, Stop, follow-up, structured movie ID; fork, reset, compact; pause video and describe a shot                                   |
 | 13:35–14:35 | Task APIs         | Programme notes → teaser/TL;DR/key points/headline; length; sections then combined summary; translate captions to Polish; detect a Polish request |
 | 14:50–15:25 | MCP               | TypeScript companion → discover search tool, read notes resource, get discussion prompt                                                           |
 | 15:25–16:40 | WebMCP            | Declarative search form, then actual audio mixer via imperative tools; validate bad arguments and inspect state                                   |
-| 16:40–17:00 | Wrap-up           | Lens → trace and architecture decisions; explain which calls stayed local                                                                         |
+| 16:40–17:00 | Wrap-up           | Inspector → trace and architecture decisions; explain which calls stayed local                                                                    |
 
 ## Repeatable demo scenarios
 
@@ -48,8 +48,14 @@ A summary-of-summaries is lossy; do not grade it purely by fluency.
 
 Play the local clip, pause, then “Describe this shot”.
 Compare visible facts against the captured image; naming unseen characters or inventing plot is a model error.
-Translate authored commentary captions into Polish before resuming playback.
+Translate dialogue subtitles into Polish before resuming playback.
 Cue times stay unchanged; compare original and translated text in the supplied catalogue and UI.
+
+### Comments
+
+Open a movie’s Comments panel, enter rough notes, and use Help me write, Adjust tone, or Check spelling.
+Review the suggested version before accepting it into the draft, then save separately.
+Refresh the movie URL to demonstrate localStorage persistence.
 
 ### Projection booth
 

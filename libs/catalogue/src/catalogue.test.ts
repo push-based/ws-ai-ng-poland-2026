@@ -7,15 +7,14 @@ import {
   validateAudioMix,
   validateRecommendation,
 } from './index.js';
-test('catalogue IDs resolve and authored cues cover the entire excerpt without overlap', () => {
+test('catalogue IDs resolve and dialogue cues stay within the excerpt and allow silent gaps', () => {
   assert.equal(new Set(movies.map((m) => m.id)).size, movies.length);
   for (const movie of movies) {
     assert.equal(getMovie(movie.id), movie);
-    assert.equal(movie.captions[0].start, 0);
-    assert.equal(movie.captions.at(-1)?.end, 30);
     movie.captions.forEach((cue, i) => {
       assert.ok(cue.end > cue.start);
-      if (i) assert.equal(cue.start, movie.captions[i - 1].end);
+      assert.ok(cue.start >= 0 && cue.end <= 30);
+      if (i) assert.ok(cue.start >= movie.captions[i - 1].end);
     });
   }
 });

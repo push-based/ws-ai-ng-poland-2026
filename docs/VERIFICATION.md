@@ -55,3 +55,21 @@ A repeat run correctly skipped downloading/generating valid assets.
 Temporarily removing a generated poster made `pnpm media:check` fail with setup instructions; the poster was restored afterwards.
 Script typechecking and lint passed. All three Nx projects' build/lint/test targets passed with the media prerequisite enabled.
 Generated media, source caches and preview screenshots are ignored by Git; the attribution document remains versioned.
+
+## Refactor and final application update
+
+Baseline application commit: `15fe2e2`, audited to exclude downloaded media, generated previews, models, caches and credentials.
+The code now uses feature folders with separate TypeScript/Angular templates/CSS, one native adapter per AI API, separate conversational session ownership, and separate MCP/WebMCP capability modules.
+Prettier is configured with the Angular template parser; lifecycle and validation rationale is documented beside the relevant code.
+
+The header now contains home branding and AI Inspector only. Movies use `/movies/:id`, with Story/Comments/Sound panels stored in the URL query parameter. The concierge remains on the home page.
+Comments are stored in localStorage after explicit save; a native proofreading suggestion was accepted and saved, then verified after refreshing the movie URL. Writer also returned a reviewable comment suggestion.
+The Agenda tab and workshop scheduling metadata have been removed from the app.
+
+Dialogue subtitles replaced the authored commentary tracks. Sintel cues come from Blender's embedded trailer subtitles; Elephants Dream uses separately attributed Wikimedia timed text. Big Buck Bunny has no dialogue track. Cue validation allows real silent gaps.
+
+The optional YOLOX-Nano model ran in Chrome's WebGPU worker and detected a person at 93% confidence in the Sintel frame, with a measured 41 ms inference. Detection starts disabled; no model/worker is created until explicit opt-in. Live tracking is separately enabled and throttled; disabling terminates the worker.
+Generated runtime assets are excluded from both Git and source linting; they are copied from the locked ONNX Runtime package without modification.
+The detector runtime and page components are lazy chunks; the initial production JS/CSS is approximately 373 kB raw / 89 kB estimated transfer, within the original budget.
+
+The expanded suite contains 22 tests across the three Nx projects, including cancellation/late model ownership, local comment storage, detection decoding, and zero-work-before-opt-in lifecycle checks.

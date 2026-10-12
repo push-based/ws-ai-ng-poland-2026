@@ -1,7 +1,10 @@
 # Nano Cinema · AI Poland 2026
 
 A small local-first movie theatre for the **AI at Zero Token Cost** workshop.
-Browse three open movies, ask a browser-native concierge, translate commentary captions, summarize programme notes, describe a captured frame, and operate a real audio mixer through WebMCP.
+Browse three open movies, ask a browser-native concierge, translate dialogue subtitles, summarize programme notes, describe a captured frame, and operate a real audio mixer through WebMCP.
+Movie comments are saved in localStorage, with optional Writer/Rewriter/Proofreader assistance that edits a draft only after acceptance.
+Each movie has a URL (`/movies/sintel`); Story, Comments and Sound are compact sidebar panels represented by a query parameter.
+The concierge lives on the home page.
 
 ## Run
 
@@ -57,9 +60,9 @@ Current Nx guidance: [TypeScript project linking](https://nx.dev/docs/kb/typescr
 
 ## Native AI versus fixtures
 
-Open **Workshop Lens → Setup** to inspect exact-task availability and prepare the Prompt model.
+Open **AI Inspector → Setup** to inspect exact-task availability and prepare the Prompt model.
 Native mode invokes the actual browser APIs and surfaces failures; it does not substitute canned output.
-**Fixtures** is an explicitly labelled, deterministic teaching mode for unsupported devices or slow downloads.
+**Fixtures** is an explicitly labelled, deterministic demo mode for unsupported devices or slow downloads.
 Fixture context counts are simulated, captions support English/Polish, and frame descriptions are deliberately generic.
 
 The core APIs are `LanguageModel`, `Summarizer`, `LanguageDetector`, and `Translator`.
@@ -132,11 +135,33 @@ Diagnostics go to stderr; stdout is reserved for the protocol.
 
 ## Workshop guide and assets
 
-See [the verification snapshot](docs/VERIFICATION.md), [the runbook](docs/WORKSHOP.md), [media credits](apps/movie-theater/public/media/ATTRIBUTION.md), and [the future ONNX extension](docs/ONNX-EXTENSION.md).
+See [the verification snapshot](docs/VERIFICATION.md), [the runbook](docs/WORKSHOP.md), [media credits](apps/movie-theater/public/media/ATTRIBUTION.md), and [the optional ONNX detector](docs/ONNX-EXTENSION.md).
 All three locally generated clips are edited to 30 seconds; the video/still assets total approximately 9 MB and are not committed.
 A published build containing those assets still needs attribution; download-on-setup does not remove their Creative Commons terms.
-Captions are **authored programme commentary**, not official dialogue transcripts.
+Subtitles contain sourced spoken dialogue, shifted to the excerpt timestamps. Big Buck Bunny has no dialogue subtitles. See [subtitle provenance](docs/SUBTITLES.md) for the separate timed-text licences.
 The supplied notes describe the original films; the excerpts are short demonstrations rather than complete screenings.
 
 The complete implementation remains intact.
-Participant TODOs and exercise branches will be prepared only after the final app is reviewed.
+No participant TODOs or exercise framework have been introduced.
+
+## Read the architecture
+
+| Area                 | Entry point                                               | Responsibility                                                                                   |
+| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| App shell and routes | `app.ts`, `app.routes.ts`                                 | Shared header/inspector and lazy-loaded URLs                                                     |
+| Discover             | `features/discover`                                       | Catalogue search and the home-page concierge                                                     |
+| Screening            | `features/screening`                                      | Route inputs and compact Story/Comments/Sound panels                                             |
+| Native AI            | `ai/prompt`, `ai/summarizer`, `ai/language`, `ai/writing` | One small adapter per browser API; explicit creation/cancellation/destruction                    |
+| Execution            | `ai/ai-runtime.service.ts`                                | Task state, progress, safe streaming, cancellation and traces                                    |
+| Concierge            | `features/concierge`                                      | Conversation composition, separate session ownership and structured recommendation validation    |
+| Comments             | `features/comments`                                       | Draft assistance, validation and localStorage persistence; accepting a suggestion never posts it |
+| Page tools           | `core/webmcp`                                             | Separate domain tool definitions, native registration and transport compatibility                |
+| Detection            | `features/detection`                                      | Opt-in worker-based ONNX/WebGPU inference and real overlays                                      |
+| Shared domain        | `libs/catalogue/src/index.ts`                             | Public exports; movie data, search, audio validation and subtitle data are separate modules      |
+| MCP server           | `apps/cinema-mcp/src/server.ts`                           | Composition root; tools/resources/prompts each have their own module                             |
+| Asset setup          | `tools/media`, `tools/download-onnx.ts`                   | Download/generation logic independent of application code                                        |
+
+Components keep TypeScript, Angular templates and CSS in separate files.
+Prettier uses the Angular parser for templates, including modern control flow; comments explain lifecycle ownership and validation boundaries.
+
+Optional detector setup: `pnpm onnx:download`. Detection remains disabled until explicitly enabled in the player.

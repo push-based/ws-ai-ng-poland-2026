@@ -1,0 +1,56 @@
+.detection-controls {
+  border-top: 1px solid var(--line);
+  padding: 18px 0;
+  margin-top: 18px;
+}
+.detection-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.detection-heading strong {
+  font-size: 12px;
+  font-weight: 500;
+  display: block;
+}
+.detection-heading span {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 5px;
+}
+.detector-status {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 10px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.detector-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.detector-options label {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.detector-options input {
+  accent-color: var(--amber);
+}
+.confidence {
+  flex: 1;
+  min-width: 170px;
+}
+.confidence input {
+  width: 100%;
+  min-width: 50px;
+}

@@ -1,23 +1,32 @@
-# Future extension: local frame detection
+# Optional ONNX object detection
 
-A compact ONNX Runtime Web example could complement browser-managed generative models.
-It should be an optional, separate Nx feature library loaded only when the participant opens it.
-The core workshop and app must not depend on its model/runtime download.
+The player includes a real YOLOX-Nano detector (approximately 3.5 MiB), exported by Megvii and distributed under Apache-2.0.
 
-Proposed interaction: pause a local film, capture one frame, run a small object detector, and overlay boxes for **person** detections.
-Show the model download size, preprocessing dimensions, backend (WebGPU or WASM), inference time and confidence threshold.
-Retain the original frame for comparison and provide a zero-detection case.
-An animated character may not be recognised by a detector trained on photographic people; this is a useful domain-shift lesson, not a reason to fabricate detections.
-Use a separately licensed real-person test image if needed; no live camera or identity recognition is required.
+```sh
+pnpm onnx:download
+```
 
-Before selecting a model:
+This verifies the pinned model checksum and copies the locked ONNX Runtime Web loader modules/WASM binaries into the ignored local `public/models` directory.
+The runtime binaries are larger than the model, but are loaded only after explicit opt-in; none are committed to Git.
+The core cinema works without this setup. Missing optional assets produce an actionable detector error, not a broken app.
 
-- Verify model and training-related redistribution terms and include attribution.
-- Measure actual compressed download size and memory, rather than assuming “nano” means small.
-- Verify the exported ONNX operators against the selected ONNX Runtime Web version.
-- Provide WASM fallback where WebGPU is unavailable, and keep runtime/model assets local.
-- Verify normalization, resizing/letterboxing, output decoding and non-maximum suppression against known fixtures.
-- Dispose tensors/session resources and cancel/ignore stale results when the selected movie changes.
+## Execution and resource boundaries
 
-Potential package boundary: `libs/frame-detection`, with `detectPeople(frame, signal)` and a typed list of boxes.
-Model choice is intentionally deferred; no ONNX package or model has been added to the core app.
+- Detection starts off. There is no worker, model fetch, GPU session or frame loop until **Enable detection** is clicked.
+- ONNX Runtime and inference execute in a dedicated worker, including frame resize, BGR/CHW conversion, output decoding and non-maximum suppression.
+- WebGPU is preferred; a failed/unavailable WebGPU provider falls back to labelled WASM.
+- Manual scanning pauses the movie and scans one frame.
+- Live tracking is a second opt-in, available only with WebGPU. It scans at most once per second, never overlaps inference, and automatically stops if a scan exceeds 250 ms.
+- Disabling terminates the worker, rejects pending work and removes overlays. Leaving the movie route disposes the player-scoped detector.
+- A generation guard prevents an old load/scan callback from altering a newly enabled detector.
+- Boxes are actual model output. Animated characters can have weak or empty detections; no demonstration boxes are fabricated.
+
+Source code: `features/detection` in the Angular app. Native browser AI is independent of this optional runtime.
+The pure decoder tests cover channel order, coordinate conversion, overlap suppression and people-only filtering. Lifecycle tests cover zero work before opt-in and worker termination on disable.
+
+## Sources and licences
+
+- [Official YOLOX release](https://github.com/Megvii-BaseDetection/YOLOX/releases/tag/0.1.1rc0)
+- [Reference ONNX inference and preprocessing](https://github.com/Megvii-BaseDetection/YOLOX/tree/main/demo/ONNXRuntime)
+- [ONNX Runtime WebGPU guide](https://onnxruntime.ai/docs/tutorials/web/ep-webgpu.html)
+- Bundled notices: `apps/movie-theater/public/models/NOTICE.md`, `YOLOX-LICENSE.txt`, and `ONNX-RUNTIME-LICENSE.txt`.
