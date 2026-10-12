@@ -45,3 +45,12 @@ Thumbs.db
 .claude/settings.local.json
 
 .angular
+
+# TypeScript incremental metadata
+*.tsbuildinfo
+
+# Downloaded/generated workshop media; keep the attribution document in Git.
+/.cache/cinema-media/
+/apps/movie-theater/public/media/*.mp4
+/apps/movie-theater/public/media/*.jpg
+/docs/screenshots/

@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "app",
   "sourceRoot": "apps/movie-theater/src",
-  "tags": [],
+  "tags": ["scope:browser", "type:app"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -32,8 +32,8 @@
             },
             {
               "type": "anyComponentStyle",
-              "maximumWarning": "4kb",
-              "maximumError": "8kb"
+              "maximumWarning": "12kb",
+              "maximumError": "18kb"
             }
           ],
           "outputHashing": "all"
@@ -43,7 +43,15 @@
           "extractLicenses": false,
           "sourceMap": true
         }
-      }
+      },
+      "dependsOn": ["^build", "media-check"],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "runtime": "tsx tools/download-media.ts --fingerprint"
+        }
+      ]
     },
     "serve": {
       "continuous": true,
@@ -56,10 +64,13 @@
         "development": {
           "buildTarget": "movie-theater:build:development"
         }
+      },
+      "dependsOn": ["^build", "media-check"],
+      "options": {
+        "prebundle": {
+          "exclude": ["@nano-cinema/catalogue"]
+        }
       }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
     },
     "serve-static": {
       "continuous": true,
@@ -68,7 +79,17 @@
         "buildTarget": "movie-theater:build",
         "staticFilePath": "dist/apps/movie-theater/browser",
         "spa": true
-      }
+      },
+      "dependsOn": ["build"]
+    },
+    "test": {
+      "command": "tsx --test apps/movie-theater/src/app/core/*.test.ts",
+      "dependsOn": ["^build"],
+      "cache": true
+    },
+    "media-check": {
+      "command": "tsx tools/download-media.ts --check",
+      "cache": false
     }
   }
 }

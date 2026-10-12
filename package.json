@@ -2,7 +2,16 @@
   "name": "@ws-ai-ng-poland-2026/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx serve movie-theater --host=127.0.0.1",
+    "build": "nx run-many -t build",
+    "lint": "nx run-many -t lint",
+    "test": "nx run-many -t test",
+    "mcp": "node apps/cinema-mcp/dist/main.js",
+    "format": "prettier --write apps libs tools docs README.md",
+    "media:download": "tsx tools/download-media.ts",
+    "media:check": "tsx tools/download-media.ts --check"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~22.1.0",
@@ -11,6 +20,7 @@
     "@angular/forms": "~22.1.0",
     "@angular/platform-browser": "~22.1.0",
     "@angular/router": "~22.1.0",
+    "@lucide/angular": "^1.55.0",
     "rxjs": "~7.8.0"
   },
   "devDependencies": {
@@ -21,6 +31,8 @@
     "@angular/compiler-cli": "~22.1.0",
     "@angular/language-service": "~22.1.0",
     "@eslint/js": "^9.8.0",
+    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/server": "2.3.1",
     "@nx/angular": "23.3.0",
     "@nx/eslint": "23.3.0",
     "@nx/eslint-plugin": "23.3.0",
@@ -29,6 +41,8 @@
     "@nx/workspace": "23.3.0",
     "@schematics/angular": "~22.1.0",
     "@swc/helpers": "~0.5.18",
+    "@types/dom-chromium-ai": "^0.0.17",
+    "@types/node": "^26.6.5",
     "@typescript-eslint/utils": "^8.58.0",
     "angular-eslint": "^22.1.0",
     "eslint": "^9.8.0",
@@ -36,7 +50,9 @@
     "nx": "23.3.0",
     "prettier": "~3.6.2",
     "tslib": "^2.3.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.58.0"
+    "typescript-eslint": "^8.58.0",
+    "zod": "^4.6.6"
   }
 }

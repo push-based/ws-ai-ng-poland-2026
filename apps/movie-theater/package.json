@@ -1,0 +1,7 @@
+{
+  "name": "@nano-cinema/movie-theater",
+  "private": true,
+  "dependencies": {
+    "@nano-cinema/catalogue": "workspace:*"
+  }
+}

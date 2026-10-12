@@ -1,0 +1,10 @@
+{
+  "name": "@nano-cinema/cinema-mcp",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@nano-cinema/catalogue": "workspace:*",
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "^4.6.6"
+  }
+}
