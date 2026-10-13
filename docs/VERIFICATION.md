@@ -2,7 +2,7 @@
 
 ## Current reference app · 13 October 2026
 
-Build, lint and all **26 tests** passed across the three Nx projects after adding preflight and local-agent evaluation. Prettier and Git diff checks passed. The preceding source-teaching-comment pass also passed its 22-test suite.
+The latest build, lint and all **30 tests** passed across the three Nx projects with Nx caching disabled after the caller correction. The initial preflight implementation passed its 26-test suite. Prettier and Git diff checks passed. The preceding source-teaching-comment pass also passed its 22-test suite.
 The comment pass emitted identical JavaScript with comments removed; it did not alter application behavior.
 Native movie-feature evidence below is from **12 October**; preflight/native agent checks were added on **13 October**, in the existing Chrome 154 experimental-API profile. This is not a clean-profile or remote-device rehearsal.
 
@@ -102,3 +102,20 @@ A successful run on one profile would not establish reliable agent behavior acro
 The already-loaded home page was tested with **tab-scoped CDP offline network emulation** after model/assets preparation. Native concierge inference returned Big Buck Bunny with a validated ID and reported 348/9216 context tokens. Networking was restored afterwards. This verifies prepared-page behavior under browser network emulation, not an OS-wide disconnect or a fresh-profile download.
 
 The explicit fixture path also completed while the tab was offline, returning the labelled Elephants Dream fixture with simulated context. Both offline overrides were removed. Preflight's 390×844 layout had document width equal to viewport width (390), with no horizontal overflow; the temporary viewport was reset.
+
+## Caller correction and repeated native verification · 13 October 2026
+
+The caller now separates capability classification from per-capability parameter extraction. Each extraction uses a fresh Prompt session and a simple typed object; the application owns tool identity, full-plan validation, finite execution and completion. This avoids mixed-schema/history contamination and removes further model decisions after a successful action.
+The model receives actual browser-discovered contracts and user requests, never evaluation IDs or expected grading answers. The grading function is unchanged.
+
+All **six cases passed in three consecutive native runs** (18/18 case outcomes) in the same Chrome 154 profile. Recorded evidence includes exact calls, selected capabilities, before/after state and actual rendered mixer values:
+
+- Read: actual `get_screening_state`, no change.
+- Mix: -5/+4/+2 dB and 65%, with sliders agreeing.
+- Invalid gain: 99 dB rejected before execution, existing values unchanged.
+- Informational question: no state-changing tool.
+- Seek: exactly one `seek_to` at 6 seconds, with no unrelated mutation.
+- Journey: movie selection before the 0/0/0 dB, 30% mix; no autoplay.
+
+The final strategy marker is `isolated-capabilities-v1`. Cancelling during inference returned to preflight with “Evaluation cancelled.”; browser error logs were empty in the passing tab.
+The uncached 30-test gate covers scoped output contracts, whole-plan validation before effects, failure/cancellation without retry, and the existing application/domain/MCP checks. This supersedes the earlier 5/6 development results retained above.

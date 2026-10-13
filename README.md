@@ -106,7 +106,7 @@ Update desktop Chrome and recheck the exact tasks in your workshop profile.
 | Angular / Nx / TypeScript             | **22.1.8 / 23.3.0 / 6.0.3**, resolved local packages                                                                               |
 | pnpm                                  | **11.21.0**, documentation review on 13 October 2026                                                                               |
 | MCP TypeScript SDK / ONNX Runtime Web | **2.3.1 / 1.30.0**                                                                                                                 |
-| Automated checks                      | Build, lint and **26 tests** passed on 13 October 2026; formatting passed                                                          |
+| Automated checks                      | Build, lint and **30 tests** passed on 13 October 2026; formatting passed                                                          |
 
 The previous native checks used the trainer's existing configured Chrome profile. Clean-profile cold downloads and remote-participant checks must be rehearsed on the actual workshop devices; see [verification evidence](docs/VERIFICATION.md) and [trainer runbook](docs/WORKSHOP.md).
 
@@ -173,9 +173,9 @@ A narrow compatibility boundary accepts modern object arguments and retries the 
 A cloud-powered inspector chat can incur its own inference cost; manual tool invocation does not require a cloud model.
 Chrome's [current WebMCP guide](https://developer.chrome.com/docs/ai/webmcp) also describes a local Prompt API caller for its tooling. Our `/preflight` runner supplies an independent local Prompt caller and invokes the browser's real discovered tools. The external extension's provider still needs checking before making a zero-cloud-cost claim.
 
-**Run local agent evaluations** on `/preflight` tests six model-facing cases with actual WebMCP execution and observed slider values. Copy its report to retain the model decisions, arguments, errors and before/after state. Results can vary; failed cases stay visible. Observed development runs scored 5/6 and caught unrelated actions/changed requested values; the suite reports those failures instead of treating fluent replies as success.
+**Run local agent evaluations** on `/preflight` tests six model-facing cases with actual WebMCP execution and observed slider values. Copy its report to retain the model decisions, arguments, errors and before/after state. Results can vary; failed cases stay visible. The caller classifies required capabilities, extracts each capability's arguments in fresh context, validates the resulting bounded plan, and stops after its final action. It never asks the model for more work after a fulfilled request. The suite still reports actual incorrect plans or state mismatches as failures. The corrected caller passed all six cases in three consecutive native Chrome runs; see the verification record.
 
-[Evaluation scenarios](docs/EVALUATION.md) separate deterministic handler checks from model-dependent tool choice, argument extraction and recovery. The 26 repository tests are not an agent-quality evaluation suite.
+[Evaluation scenarios](docs/EVALUATION.md) separate deterministic handler checks from model-dependent tool choice, argument extraction and recovery. The 30 repository tests are not an agent-quality evaluation suite.
 
 ### A caller says WebMCP is unavailable, but DevTools lists tools
 

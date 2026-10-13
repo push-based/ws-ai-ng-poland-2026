@@ -84,9 +84,10 @@
     <span class="eyebrow">MODEL-FACING CHECKS</span>
     <h2>Can a local agent use the tools?</h2>
     <p>
-      A real Prompt API session chooses each action from browser-discovered
-      tools, calls native WebMCP, sees results/errors, and is graded against
-      observed state. No cloud model or scripted fixture planner.
+      Local Prompt sessions classify the requested capabilities, then extract
+      each tool's arguments in fresh context. A validated finite plan calls
+      native WebMCP and is graded against observed state. No cloud model or
+      scripted fixture planner.
     </p>
     <p class="micro">
       This run opens movies and changes their reversible mix/seek state. Six

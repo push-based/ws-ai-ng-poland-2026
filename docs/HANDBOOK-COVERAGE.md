@@ -26,7 +26,7 @@ This review covers the complete reference app. Participant exercises will be der
 ## Handbook gaps closed
 
 - **Shareable preflight:** `/preflight` reuses the capability checks, adds exact image/reverse-language checks, shows readiness colours and exports diagnostics. Hardware storage/VRAM are explicitly unmeasured.
-- **Model-facing evaluations:** `/preflight` has a bounded local Prompt caller that executes native browser-discovered tools, feeds outcomes back to the model and grades observed state/DOM values. Model failures are recorded rather than replaced with fixtures.
+- **Model-facing evaluations:** `/preflight` has a bounded local Prompt caller that executes native browser-discovered tools, validates a finite model-proposed plan, executes it once and grades observed state/DOM values. Model failures are recorded rather than replaced with fixtures.
 
 Both features are implemented in the complete reference app; no unfinished participant edition has been introduced.
 

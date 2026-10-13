@@ -2,8 +2,10 @@
 
 Automated repository tests check deterministic data/validation, storage, cancellation, detection decoding and MCP transport. Native browser smoke checks prove particular APIs/tool calls executed in the tested profile.
 Neither establishes that an agent reliably chooses the right tool from natural-language intent.
-Open `/preflight` → **Run local agent evaluations** to run the built-in six-case suite. A real local Prompt session receives browser-discovered schemas, chooses one typed action per step, sees its result/error, then chooses again. It uses native `document.modelContext.executeTool`, not direct fixture handlers.
-The runner records service state **and actual slider values**, requires correct action order, limits each case to six decisions/60 seconds, and destroys the case session. A visible Stop control remains available across tool-driven navigation. Expected answers stay outside model context.
+Open `/preflight` → **Run local agent evaluations** to run the built-in six-case suite. A real local Prompt classifier marks required browser-discovered capabilities, then fresh per-capability sessions extract arguments. The application fixes each selected tool's identity and owns the finite execution plan. It uses native `document.modelContext.executeTool`, not direct fixture handlers.
+The runner records service state **and actual slider values**, requires correct action order, limits each case to six capabilities/60 seconds, and destroys every model session. A visible Stop control remains available across tool-driven navigation. Expected answers stay outside model context.
+Capability classification uses simple boolean output. Parameter extraction receives just one contract and cannot produce another operation. The assembled plan is validated before its first effect, each action executes once, and handler errors stop the plan without retries. No generation occurs after a fulfilled action. These boundaries avoid schema/history contamination and opportunistic follow-up actions.
+
 The extended external-caller scenarios below remain a rehearsal plan for whichever separate plugin/inspector is used.
 
 ## Record the environment

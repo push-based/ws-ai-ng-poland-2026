@@ -24,6 +24,7 @@ export interface EvaluationResult {
   after: EvaluationState;
   detail: string;
   renderedMix: AudioMix | null;
+  selectedTools?: string[];
 }
 
 // Fixed user intents are the inputs. Expected tool calls are kept out of the model
