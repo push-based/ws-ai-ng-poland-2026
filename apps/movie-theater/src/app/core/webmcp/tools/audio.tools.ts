@@ -1,6 +1,9 @@
 import type { Router } from '@angular/router';
 import type { CinemaService } from '../../cinema.service';
 import type { PageTool } from '../tool.types';
+// This is the main imperative WebMCP demonstration: an agent calls a domain
+// operation that changes Web Audio filters, rather than filling out a form.
+// A human still needs to unlock playback/audio with a gesture first.
 export function audioTools(cinema: CinemaService, router: Router): PageTool[] {
   return [
     {

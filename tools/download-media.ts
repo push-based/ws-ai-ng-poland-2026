@@ -16,6 +16,9 @@ async function main() {
     );
     return;
   }
+  // Media is downloaded at setup time, not by the movie UI, and stays out of
+  // Git. Check/fingerprint modes verify local assets without network access.
+  // Nx uses the fingerprint to include those ignored assets in its cache identity.
   const valid = await validOutputs();
   if (args.includes('--check') || args.includes('--fingerprint')) {
     if (!valid)

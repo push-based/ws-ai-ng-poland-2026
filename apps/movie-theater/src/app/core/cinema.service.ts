@@ -15,6 +15,9 @@ export class CinemaService {
   readonly captionTexts = signal<string[]>(
     getMovie('sintel').captions.map((c) => c.text),
   );
+  // Cue times are measured from the start of our excerpt. Find the spoken cue
+  // covering the playback time and use the translated text at the same index.
+  // If no cue covers this time, display nothing: silent gaps are intentional.
   readonly caption = computed(() => {
     const index = this.movie().captions.findIndex(
       (c) => this.time() >= c.start && this.time() < c.end,
@@ -67,6 +70,9 @@ export class CinemaService {
     this.time.set(seconds);
   }
 
+  // The player and WebMCP use this same operation. Publish the chosen language
+  // only after the whole translation succeeds; otherwise the current captions
+  // remain intact. Check the film ID after awaiting so results cannot cross movies.
   async subtitles(language: string, signal?: AbortSignal) {
     if (!['en', 'pl', 'de', 'es', 'fr'].includes(language))
       throw new Error('Unsupported subtitle language.');
@@ -78,6 +84,8 @@ export class CinemaService {
     this.subtitleLanguage.set(language);
   }
 
+  // Tools return this explicit snapshot rather than DOM scraping. An agent can
+  // inspect the actual player and mixer state before deciding its next operation.
   state() {
     return {
       movieId: this.movieId(),

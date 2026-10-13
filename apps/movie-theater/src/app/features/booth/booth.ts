@@ -63,6 +63,9 @@ export class Booth {
     });
   }
 
+  // The local path calls our dispatch method directly. The native path goes
+  // through browser discovery and executeTool(), which invokes the registered
+  // handler. Both exercise the same action; neither button itself runs an AI agent.
   async example(kind: BoothExample) {
     try {
       const command = boothCommand(kind);
@@ -84,6 +87,8 @@ export class Booth {
     const context = canvas.getContext('2d');
     if (context && canvas.offsetParent !== null && !document.hidden) {
       context.clearRect(0, 0, canvas.width, canvas.height);
+      // Web Audio returns magnitude bytes (0–255) per frequency bin. Display every
+      // second bin as one of 64 bars; scale its measured magnitude into canvas height.
       const data = this.cinema.audio.spectrum();
       const count = 64;
       const gap = 4;

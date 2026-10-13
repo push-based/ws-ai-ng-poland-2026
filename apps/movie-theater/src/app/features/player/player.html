@@ -17,6 +17,11 @@
         )
       "
     ></video>
+    <!--
+      ONNX returns normalized coordinates, not HTML. Multiply each fraction by
+      100 to position the real predicted rectangle as a percentage of the screen.
+      Only detections from an explicitly requested scan appear in this layer.
+    -->
     <div class="detection-layer" aria-hidden="true">
       @for (box of detector.boxes(); track $index) {
         <div

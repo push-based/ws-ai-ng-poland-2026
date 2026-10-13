@@ -53,6 +53,9 @@ export class AiInspector {
     this.runtime.setMode(this.value(event) as 'native' | 'fixture');
   }
 
+  // availability() only reports a configuration's support/readiness. Preparing
+  // creates the concierge session, which can download the actual model, then
+  // checks availability again so participants can observe the state transition.
   async prepare() {
     try {
       await this.concierge.prepare();

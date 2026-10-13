@@ -61,6 +61,9 @@ export class Comments {
     this.tone.set((event.target as HTMLSelectElement).value as RewriterTone);
   }
 
+  // Keep generated text in a separate suggestion. The existing draft survives
+  // a failed task or a rejected suggestion; accepting it edits the draft, and only
+  // Save comment persists it. The model never publishes on the viewer's behalf.
   async assist(action: CommentAssistance) {
     if (!this.draft().text.trim() || this.runtime.busy()) return;
     this.saved.set(false);

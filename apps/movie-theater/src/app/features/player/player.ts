@@ -125,6 +125,9 @@ export class Player {
     }
   }
 
+  // Pause and copy the current video pixels into a canvas. Both the preview and
+  // image-input Prompt call use that same captured frame, so participants can check
+  // what the model was actually given. This is independent of ONNX object detection.
   async capture() {
     const video = this.video().nativeElement;
     if (!video.videoWidth) {
@@ -133,6 +136,8 @@ export class Player {
     }
     this.cinema.pause();
     const canvas = document.createElement('canvas');
+    // Use intrinsic video dimensions, not the CSS display size: the model should
+    // receive the source pixels even when the visible player has been resized.
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d')?.drawImage(video, 0, 0);

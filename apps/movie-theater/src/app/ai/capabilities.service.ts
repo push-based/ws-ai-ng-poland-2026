@@ -11,6 +11,10 @@ export class CapabilitiesService {
   private readonly runtime = inject(AiRuntime);
   readonly capabilities = signal<Capability[]>([]);
 
+  // Checking an API has two stages: is the browser global exposed, and can its
+  // availability() support the chosen languages/modality on this device? A present
+  // global alone does not mean the model is ready. This screen checks capability;
+  // model creation/download is a separate, explicit viewer action.
   async check() {
     const checks: {
       name: ApiName;
@@ -77,6 +81,9 @@ export class CapabilitiesService {
         detail: 'Experimental',
       },
     ];
+    // These checks are independent, so run them together. Catch each check separately:
+    // one unsupported experimental API must not hide the results of the others.
+    // Typical native states: unavailable, downloadable, downloading, and available.
     this.capabilities.set(
       await Promise.all(
         checks.map(async (item) => {

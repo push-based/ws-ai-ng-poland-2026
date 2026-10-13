@@ -8,6 +8,9 @@ export function getMovie(id: string): Movie {
   if (!movie) throw new Error(`Unknown movie: ${id}`);
   return movie;
 }
+// This shared search is ordinary filtering, not semantic model inference.
+// Spoken-language filtering uses catalogue facts: Bunny's audioLanguage is
+// 'none'. A translated subtitle track does not change a movie's spoken language.
 export function searchMovies(query = '', language = ''): readonly Movie[] {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   return movies.filter(

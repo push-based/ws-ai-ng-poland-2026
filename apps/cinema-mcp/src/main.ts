@@ -2,6 +2,9 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { createCinemaServer } from './server.js';
 // The SDK entry negotiates modern and legacy protocol eras. Never log to stdout:
 // stdout is reserved for the MCP wire protocol; diagnostics belong on stderr.
+// An MCP host launches this process and communicates through stdin/stdout.
+// The SDK owns framing, discovery and protocol negotiation; our modules supply
+// capabilities. Ordinary console.log output would corrupt the protocol stream.
 const handle = serveStdio(createCinemaServer, {
   onerror: (error) => console.error(error.message),
 });

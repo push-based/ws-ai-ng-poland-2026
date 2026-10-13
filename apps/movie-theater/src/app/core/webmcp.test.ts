@@ -1,3 +1,6 @@
+// The compatibility tests distinguish a failure before argument parsing from
+// a failure inside a tool action. Only the former is safe to retry with another
+// encoding; retrying a completed or partially completed action could duplicate it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { executeDiscoveredTool, toolMetadata } from './webmcp/webmcp-client.js';

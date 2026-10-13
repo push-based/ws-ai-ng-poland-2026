@@ -48,6 +48,9 @@ export class Notes {
     );
   }
 
+  // Capture the selected task options and pass them to the feature service.
+  // The result comes from Summarizer, not Prompt; even Markdown output remains
+  // plain displayed text here, rather than being injected into the page as HTML.
   async summarize() {
     try {
       this.result.set(

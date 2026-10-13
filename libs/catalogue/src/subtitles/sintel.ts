@@ -3,6 +3,9 @@
  * Subtitle text license: CC BY 3.0; see docs/SUBTITLES.md.
  */
 import type { Cue } from '../movie.js';
+// These are sourced dialogue cues, not generated summaries. Subtract the
+// excerpt's 5-second starting position from original timestamps (12.149 − 5 = 7.149).
+// Translation changes the strings only; these shifted times remain the reference.
 export const sintelSubtitles: Cue[] = [
   {
     start: 7.149,

@@ -11,6 +11,9 @@ export interface NativeToolExecutor {
     args: Record<string, unknown> | string,
   ): Promise<unknown>;
 }
+// Experimental builds differ in argument encoding. Try an object first and
+// retry a JSON string only for the known pre-execution parser error. Retrying
+// an action after its handler ran could apply a side effect twice.
 export async function executeDiscoveredTool(
   context: NativeToolExecutor,
   tool: DiscoveredTool,

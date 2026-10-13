@@ -1,4 +1,7 @@
 import { Movie, Recommendation, movies } from '@nano-cinema/catalogue';
+// These deterministic examples let participants exercise the UI without a model.
+// Keyword matching is deliberately simple and is not an AI recommendation engine.
+// Fixtures are always labelled; they do not stand in for a failed native API call.
 export function fixtureRecommendation(request: string): Recommendation {
   const text = request.toLowerCase();
   const movie = /fun|comedy|light|rabbit|zabaw|lustig/.test(text)
@@ -11,6 +14,8 @@ export function fixtureRecommendation(request: string): Recommendation {
     reason: `${movie.title} is our ${movie.genre.toLowerCase()} pick: ${movie.description} This is a deterministic demo fixture.`,
   };
 }
+// These confidence values are illustrative constants. Native detection obtains
+// ranked predictions from LanguageDetector; this regex does not measure confidence.
 export function fixtureLanguage(text: string): {
   language: string;
   confidence: number;
@@ -23,6 +28,8 @@ export function fixtureLanguage(text: string): {
     return { language: 'de', confidence: 0.94 };
   return { language: 'en', confidence: 0.85 };
 }
+// One translated string per real dialogue cue, in the same order. The playback
+// code reuses the original timings, including silent gaps and Bunny's empty track.
 const polish: Record<string, string[]> = {
   sintel: ['Co sprowadza cię do krainy strażników?', 'Szukam kogoś…'],
   bunny: [],

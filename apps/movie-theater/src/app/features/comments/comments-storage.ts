@@ -3,6 +3,8 @@ import {
   MovieComment,
   parseComments,
 } from './comments.model';
+// Use the same read/write boundary with browser localStorage or an in-memory
+// test implementation. The model assistance code has no access to this boundary.
 export interface CommentStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;

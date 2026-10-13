@@ -1,4 +1,7 @@
 import type { Movie } from '../movie.js';
+// No spoken dialogue means an empty cue array. Sound effects/music still
+// provide a real audio source for the EQ demo; a language model should not
+// create a transcript merely because a movie has an audio stream.
 export const bunny: Movie = {
   id: 'bunny',
   title: 'Big Buck Bunny',

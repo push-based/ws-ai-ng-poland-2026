@@ -12,6 +12,9 @@ export class RewriterApi {
   ): Promise<string> {
     if (typeof Rewriter === 'undefined')
       throw new Error('Rewriter developer trial is unavailable.');
+    // Rewriter starts from existing prose. tone changes how it is phrased;
+    // sharedContext describes what must be preserved across the task. This guidance
+    // can reduce invented content, but the viewer still needs to review the suggestion.
     const options: RewriterCreateOptions = {
       ...englishTaskOptions,
       tone,
@@ -31,6 +34,8 @@ export class RewriterApi {
         signal,
       );
     } finally {
+      // This is a one-shot model instance. Always destroy it when the task ends,
+      // including cancellation or an exception, to release browser-managed resources.
       model.destroy();
     }
   }

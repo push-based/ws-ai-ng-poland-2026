@@ -43,6 +43,12 @@
       >{{ films().length.toString().padStart(2, '0') }} FILMS / ALL LOCAL</span
     >
   </div>
+  <!--
+    Declarative WebMCP: the existing search form advertises its purpose with
+    toolname/tooldescription and its inputs with toolparamdescription. A browser
+    caller can discover the form's contract; ordinary human submission still works.
+    Compare this with the imperative audio tool registered in core/webmcp.
+  -->
   <form
     class="search"
     toolname="search_catalogue"

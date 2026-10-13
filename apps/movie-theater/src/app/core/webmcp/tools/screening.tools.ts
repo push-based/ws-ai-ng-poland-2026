@@ -1,5 +1,8 @@
 import type { CinemaService } from '../../cinema.service';
 import type { PageTool } from '../tool.types';
+// A tool can be asynchronous: subtitle translation may prepare a model and
+// run inference. Forward the caller's AbortSignal through the feature pipeline
+// so cancelling that tool call can cancel the work, not just its UI response.
 export function screeningTools(cinema: CinemaService): PageTool[] {
   return [
     {

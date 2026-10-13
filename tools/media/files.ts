@@ -17,6 +17,9 @@ export async function sha256(file: string): Promise<string> {
   return hash.digest('hex');
 }
 
+// A generation receipt ties source hashes and recipe revision to all six
+// output hashes. File existence alone is not enough: a stale or truncated clip
+// must fail the prerequisite check rather than appear as a broken movie demo.
 export async function validOutputs(): Promise<Manifest | null> {
   try {
     const manifest = JSON.parse(

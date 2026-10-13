@@ -10,6 +10,9 @@ export const output = join(root, 'apps/movie-theater/public/media');
 
 export const manifestFile = join(cache, 'generated.json');
 
+// The receipt is valid only for this generation recipe and these exact source
+// hashes. Increment the recipe when crop/encoding settings change so previously
+// generated assets are not mistaken for the new recipe's output.
 export const recipeRevision = 1;
 
 export const sources = [

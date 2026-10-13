@@ -47,6 +47,9 @@ export class ConciergeService {
     this.detected.set(null);
   }
 
+  // Prepare creates the persistent Prompt session from a visible action. It can
+  // trigger a model download now, before the participant asks their first question.
+  // An availability check by itself would not prepare that session.
   async prepare() {
     if (this.runtime.mode() === 'fixture') {
       this.runtime.trace(
@@ -72,6 +75,8 @@ export class ConciergeService {
         }
 
         const session = await this.sessions.get(signal);
+        // An explicit language choice bypasses detection; otherwise ask the detector.
+        // Detection guides the translation pipeline, not which subtitle language to select.
         const language = languageOverride
           ? { language: languageOverride, confidence: 1 }
           : await this.languages.detect(request, signal);
@@ -85,6 +90,9 @@ export class ConciergeService {
           'en',
           signal,
         );
+        // First stream a human-readable answer into the shared session. Then make a
+        // second prompt in that same conversation to extract the selection as JSON.
+        // The second call can refer to the recommendation because the session retains context.
         const explanation = await this.runtime.stream(
           session.promptStreaming(english, { signal }),
           signal,
@@ -96,6 +104,8 @@ export class ConciergeService {
         // JSON shape is insufficient: the ID must resolve to a real catalogue entry.
         const recommendation = validateRecommendation(JSON.parse(json));
 
+        // Reasoning stays in English, but translate the displayed reason back to the
+        // request language. Keep the machine-readable catalogue ID unchanged.
         if (language.language !== 'en') {
           recommendation.reason = await this.translator.translate(
             recommendation.reason,
@@ -138,6 +148,9 @@ export class ConciergeService {
     });
   }
 
+  // A conversation has a finite context window. Compaction summarizes the visible
+  // turns, then creates a fresh session seeded with that summary and the catalogue
+  // instruction. This trades detail for space; it is not lossless compression.
   async compact() {
     await this.runtime.run(
       'Summarizer',
@@ -197,6 +210,8 @@ export class ConciergeService {
         : fixtureLanguage(request),
     );
     let streamed = '';
+    // Simulate incremental output for the fixture demonstration. These timed words
+    // are not model tokens, and the fixture's context usage is only an illustration.
     for (const word of result.reason.split(' ')) {
       signal.throwIfAborted();
       await new Promise((resolve) => setTimeout(resolve, 25));

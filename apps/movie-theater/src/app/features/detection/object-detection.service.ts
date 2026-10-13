@@ -14,6 +14,9 @@ export class ObjectDetectionService {
   readonly milliseconds = signal(0);
   readonly boxes = signal<Detection[]>([]);
   private worker?: Worker;
+  // Each enable/disable cycle changes this counter. An old async load/scan may
+  // finish after the viewer disables and re-enables detection; compare generations
+  // before accepting its result so it cannot update the new detector instance.
   private generation = 0;
   private nextId = 0;
   private readonly pending = new Map<
@@ -29,6 +32,9 @@ export class ObjectDetectionService {
     inject(DestroyRef).onDestroy(() => this.disable());
   }
 
+  // This is the only place a worker is created. Merely opening the movie page
+  // does not import ONNX Runtime, fetch weights, capture a frame or allocate a GPU
+  // session. The load message prepares resources but does not start live inference.
   async enable() {
     if (this.enabled()) return;
     const generation = ++this.generation;
@@ -94,12 +100,17 @@ export class ObjectDetectionService {
     const generation = this.generation;
     this.busy.set(true);
     try {
+      // Snapshot one frame so the worker scans a stable image even if playback
+      // continues. createImageBitmap is asynchronous, so re-check ownership after
+      // capture in case the viewer disabled detection while it was pending.
       const frame = await createImageBitmap(video);
       // A viewer can turn detection off while the frame capture is pending.
       if (!this.worker || generation !== this.generation) {
         frame.close();
         return;
       }
+      // Transfer the bitmap instead of copying it. After postMessage, the worker
+      // owns and closes it. The returned promise waits for a reply with the matching ID.
       const result = await this.request(
         { kind: 'scan', frame, threshold, peopleOnly },
         [frame],
@@ -120,6 +131,9 @@ export class ObjectDetectionService {
     }
   }
 
+  // postMessage is fire-and-reply rather than an async function call. Store a
+  // promise resolver by request ID, post the message, then resolve/reject when
+  // receive() gets that ID back. Timeout and disable reject outstanding promises.
   private request(
     input:
       | Omit<Extract<DetectorRequest, { kind: 'load' }>, 'id'>

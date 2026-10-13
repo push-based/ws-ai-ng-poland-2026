@@ -3,6 +3,9 @@ import { movies } from '@nano-cinema/catalogue';
 
 /** Expose curated notes as MCP resources. Reading a resource performs no inference. */
 export function registerMovieResources(server: McpServer): void {
+  // Give each film a stable cinema:// URI that a client can list and read.
+  // These are MCP resource identifiers resolved by this server, not HTTP URLs.
+  // Reading one returns the curated JSON data without generating new text.
   for (const movie of movies)
     server.registerResource(
       `${movie.id}_notes`,

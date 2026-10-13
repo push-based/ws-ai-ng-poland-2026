@@ -8,6 +8,10 @@ export class MovieSummaryService {
   private readonly runtime = inject(AiRuntime);
   private readonly summarizer = inject(SummarizerApi);
 
+  // Two demonstrations share the same native Summarizer adapter: summarize one
+  // source directly, or summarize each notes section and then summarize the results.
+  // The second pipeline demonstrates composition; our tiny notes do not require it
+  // to fit a model limit, and each stage can lose facts.
   summarize(
     movie: Movie,
     options: SummaryOptions,
@@ -35,6 +39,9 @@ export class MovieSummaryService {
               : '')
           );
         }
+        // A teaser receives only the spoiler-free synopsis. Other direct styles receive
+        // all programme notes. Source selection matters: changing output style cannot
+        // guarantee no spoilers if the input already contains an ending.
         if (!chunked)
           return this.summarizer.summarize(
             options.type === 'teaser'
@@ -64,6 +71,8 @@ export class MovieSummaryService {
             summaries[index],
           );
         }
+        // The final model call sees section summaries, not the original notes. Compare
+        // it with those notes to notice omissions or distortions introduced by either stage.
         return this.summarizer.summarize(
           summaries.join('\n\n'),
           options,

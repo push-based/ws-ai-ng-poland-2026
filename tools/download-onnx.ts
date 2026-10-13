@@ -8,6 +8,9 @@ import { root } from './media/config';
 
 const output = join(root, 'apps/movie-theater/public/models');
 const modelFile = join(output, 'yolox-nano.onnx');
+// Pin both the official model URL and its expected bytes. Model-specific
+// preprocessing/decoding depends on this exact export; replacing the file
+// requires reviewing the input shape, channel layout and output schema too.
 const source = {
   id: 'yolox-nano',
   file: 'yolox-nano.onnx',
@@ -16,6 +19,9 @@ const source = {
   sha256: 'c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d',
 };
 async function main() {
+  // Nx also builds when detection is not installed. This fingerprint records
+  // the actual optional assets when present, so the build cache cannot confuse
+  // a model-equipped build with a build that has no optional binaries.
   if (process.argv.includes('--fingerprint')) {
     try {
       const names = (await readdir(join(output, 'ort'))).sort();
@@ -37,6 +43,9 @@ async function main() {
   const original = await download(source);
   await copyFile(original, modelFile);
   // Keep the WASM loader modules and binaries from the installed runtime version together.
+  // The JS loader and WASM binaries are version-coupled. Copy them from the
+  // locked installed package instead of mixing versions or fetching a runtime
+  // from a CDN when detection is enabled. The browser selects the variant it needs.
   const runtimeRoot = dirname(
     dirname(createRequire(import.meta.url).resolve('onnxruntime-web')),
   );

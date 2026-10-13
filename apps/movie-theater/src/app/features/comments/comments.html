@@ -63,6 +63,11 @@
         Check spelling <span>Proofreader</span>
       </button>
     </div>
+    <!--
+      Generation, acceptance and saving are three separate actions. This preview
+      lets the viewer inspect the generated wording before it replaces their draft;
+      accepting it still does not write a comment to localStorage.
+    -->
     @if (suggestion()) {
       <div class="suggestion" aria-live="polite">
         <span class="eyebrow"
@@ -120,6 +125,10 @@
             comment.createdAt | date: 'medium'
           }}</time>
         </div>
+        <!--
+          Stored or model-assisted comments remain literal text here. A string such
+          as <script> in a comment is content to display, not code to execute.
+        -->
         <p>{{ comment.text }}</p>
       </article>
     } @empty {

@@ -1,4 +1,7 @@
 import type { DiscoveredTool } from './webmcp-client';
+// An imperative page tool describes a callable operation: a name, a description
+// to help an agent choose it, a JSON input schema, and the handler that does the work.
+// The schema advertises a contract; the handler still validates actual arguments.
 export interface PageTool {
   name: string;
   description: string;

@@ -12,6 +12,10 @@ test('image preprocessing preserves the required BGR planar channel order', () =
   assert.throws(() => toBgrTensor(new Uint8ClampedArray(4)), /frame size/);
 });
 
+// This numeric fixture is independent of model quality. Two cells encode the
+// same 32×32 person box: offset 2 at cell x=0 and offset 1 at cell x=1 both
+// recover centre x=(offset+cell)×8=16. The higher-confidence prediction wins.
+// These checks teach decoding/NMS; they do not prove the model detects every person.
 test('raw grid predictions decode to normalized boxes and duplicate boxes are suppressed', () => {
   const output = new Float32Array(3549 * 85);
   // Two grid cells predict the same person box, with different confidence.

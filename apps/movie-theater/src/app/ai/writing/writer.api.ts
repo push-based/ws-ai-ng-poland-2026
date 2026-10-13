@@ -17,11 +17,16 @@ export class WriterApi {
     const model = await Writer.create(options);
     try {
       signal.throwIfAborted();
+      // Writer turns the supplied rough notes/instruction into new prose. It returns
+      // streamed text, not a saved comment. The feature previews that text and leaves
+      // acceptance and persistence to separate viewer actions.
       return await this.runtime.stream(
         model.writeStreaming(instruction, { signal }),
         signal,
       );
     } finally {
+      // This is a one-shot model instance. Always destroy it when the task ends,
+      // including cancellation or an exception, to release browser-managed resources.
       model.destroy();
     }
   }

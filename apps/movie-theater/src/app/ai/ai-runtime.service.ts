@@ -61,6 +61,9 @@ export class AiRuntime {
     this.streamText.set(text);
   }
 
+  // create() can trigger a browser-managed model download. The monitor exposes
+  // progress events, whose loaded value is a fraction for the progress UI. Ignore
+  // events from cancelled work so an old download cannot update the next task.
   downloadMonitor(signal: AbortSignal): CreateMonitorCallback {
     return (monitor) =>
       monitor.addEventListener('downloadprogress', (event) => {
@@ -68,6 +71,9 @@ export class AiRuntime {
       });
   }
 
+  // Call availability() with the same configuration that will be passed to create().
+  // 'downloadable' is allowed: creation can fetch the model. 'unavailable' is a real
+  // capability failure and should be shown instead of pretending inference succeeded.
   async require(api: ApiName, availability: () => Promise<Availability>) {
     this.trace(api, 'availability()', 'Checking exact task configuration');
     if ((await availability()) === 'unavailable')
@@ -85,6 +91,9 @@ export class AiRuntime {
   ): Promise<T> {
     if (this.busy())
       throw new Error('Another AI task is running. Stop it or wait.');
+    // One controller represents this entire operation, including composed API calls.
+    // If a WebMCP caller also supplies a cancellation signal, AbortSignal.any lets
+    // either the viewer's Stop button or that caller cancel the same work.
     const controller = new AbortController();
     this.controller = controller;
     const signal = externalSignal
@@ -97,6 +106,8 @@ export class AiRuntime {
     this.trace(api, operation, `${this.mode()} mode`);
     try {
       const result = await work(signal);
+      // Some implementations finish a promise even after cancellation. Check again
+      // before handing a result to the feature so cancelled output cannot be accepted.
       signal.throwIfAborted();
       return result;
     } catch (error) {
@@ -104,6 +115,8 @@ export class AiRuntime {
         this.taskError.set(signal.aborted ? 'Cancelled.' : errorMessage(error));
       throw error;
     } finally {
+      // Reset can start a new operation before an old promise finishes. Only the
+      // controller still stored as current may clear busy/error state for that operation.
       if (this.controller === controller) {
         this.controller = undefined;
         this.running.set(false);
@@ -117,8 +130,14 @@ export class AiRuntime {
     signal: AbortSignal,
   ): Promise<string> {
     this.streamText.set('');
+    // A streaming API returns a ReadableStream instead of one final string. Read
+    // chunks in order and accumulate them for display. This code treats chunks as
+    // additional text, so the feature gets both live progress and the final text.
     const reader = stream.getReader();
     let result = '';
+    // Aborting the model request alone might leave reader.read() waiting. Cancel the
+    // reader too, then remove the listener and release the lock in finally, including
+    // when streaming fails. This prevents a stopped operation from hanging the UI.
     const cancel = () => {
       void reader.cancel(signal.reason).catch(() => undefined);
     };

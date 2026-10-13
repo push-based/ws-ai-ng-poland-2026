@@ -62,6 +62,10 @@ export async function generateMedia(): Promise<void> {
       console.log(`${source.id}: generating 30-second excerpt and poster`);
       const clip = join(stage, `${source.id}.mp4`);
       const poster = join(stage, `${source.id}.jpg`);
+      // Generate the small browser asset: -ss selects the source offset, -t limits
+      // the excerpt to 30 seconds, scale keeps its aspect ratio, and H.264/AAC provide
+      // video/audio. +faststart moves MP4 metadata forward for earlier playback.
+      // Caption timestamps were shifted by the same source offset in the catalogue.
       await command('ffmpeg', [
         '-nostdin',
         '-hide_banner',

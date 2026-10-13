@@ -30,6 +30,9 @@ export async function download(
     const body = response.body;
     if (!response.ok || !body)
       throw new Error(`HTTP ${response.status} downloading ${source.id}`);
+    // Stream the response to disk instead of holding a full source movie in memory.
+    // The partial file becomes a reusable cache entry only after SHA-256 verification;
+    // an interrupted or changed upstream download must not be treated as valid media.
     await pipeline(
       Readable.from(
         (async function* () {

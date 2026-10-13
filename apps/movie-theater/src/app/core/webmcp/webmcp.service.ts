@@ -24,6 +24,9 @@ export class WebmcpService {
   private readonly cinema = inject(CinemaService);
   private readonly router = inject(Router);
   private readonly controller = new AbortController();
+  // WebMCP exposes operations inside the running page. These handlers access
+  // the live player/audio state. The separate Node MCP companion only exposes
+  // catalogue information and cannot control this page's audio graph.
   readonly tools = [
     ...catalogueTools(this.cinema, this.router),
     ...audioTools(this.cinema, this.router),
@@ -45,6 +48,9 @@ export class WebmcpService {
     }
     if (this.registered()) return;
     try {
+      // Registration makes capabilities discoverable; it does not run an agent or
+      // call a language model. Route native executions through invoke() so a real
+      // browser call and the local example button share validation and logging.
       for (const tool of this.tools)
         await context.registerTool(
           {
@@ -80,6 +86,9 @@ export class WebmcpService {
       string,
       unknown
     >;
+    // Reject unknown properties at the dispatch boundary. Each operation then
+    // checks required values/types/ranges in its handler or the shared domain method.
+    // Tool metadata alone is not an authorization or input-validation mechanism.
     if (Object.keys(args).some((key) => !(key in properties)))
       throw new Error('Unexpected tool argument.');
     try {
@@ -90,6 +99,8 @@ export class WebmcpService {
           ...items,
         ].slice(0, 12),
       );
+      // Return structured tool-result content, with a JSON text payload describing
+      // the actual outcome. This is evidence for the caller, not a model-written reply.
       return { content: [{ type: 'text', text: JSON.stringify(result) }] };
     } catch (error) {
       const result = error instanceof Error ? error.message : String(error);
@@ -109,6 +120,9 @@ export class WebmcpService {
       throw new Error(
         'Native WebMCP discovery/execution is not available in this Chrome build. Use an external inspector or local handler tests.',
       );
+    // Exercise browser discovery/execution rather than calling our handler directly.
+    // Use the descriptor returned by this browser for execution; the Inspector holds
+    // only a serializable metadata copy. No agent inference happens in this method.
     const tools = await context.getTools();
     this.discovered.set(toolMetadata(tools));
     const tool = tools.find((tool) => tool.name === name);

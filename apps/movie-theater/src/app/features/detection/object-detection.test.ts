@@ -9,6 +9,9 @@ import {
 import { ObjectDetectionService } from './object-detection.service.js';
 import { DetectorRequest } from './detection.types.js';
 
+// Replace the worker with a controlled stand-in to observe resource ownership.
+// This verifies that opt-in alone creates/loads it and disable terminates it.
+// Actual WebGPU inference requires the downloaded model and a browser check.
 test('detector construction does no worker work; explicit enable is manual-only, and disable terminates it', async () => {
   const originalWorker = globalThis.Worker;
   const originalDocument = globalThis.document;

@@ -60,6 +60,11 @@
   >
     Generate {{ type() }}
   </button>
+  <!--
+    Generated output is displayed as text, including when Markdown format was
+    requested. Model output is not trusted HTML; requesting a format does not
+    make it safe to inject into a page. Compare with the source notes below.
+  -->
   @if (result()) {
     <div class="result" aria-live="polite">{{ result() }}</div>
   }

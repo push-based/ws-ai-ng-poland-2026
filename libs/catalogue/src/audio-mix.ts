@@ -12,6 +12,9 @@ export interface AudioMix {
   volume: number;
 }
 
+// Treat tool arguments as runtime data, even when a JSON schema or TypeScript
+// type exists elsewhere. Reject missing/non-finite/out-of-range values before
+// returning a complete mix. EQ values are dB; volume is a linear gain fraction.
 export function validateAudioMix(input: unknown): AudioMix {
   if (!input || typeof input !== 'object')
     throw new Error('Audio mix must be an object.');

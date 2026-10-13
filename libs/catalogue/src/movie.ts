@@ -1,3 +1,6 @@
+// A cue separates content from timing: start/end are seconds in the edited
+// 30-second clip, and only text is translated. There need not be a cue in
+// every second; a silent scene has no invented transcript.
 export interface Cue {
   start: number;
   end: number;
@@ -25,6 +28,9 @@ export interface Movie {
   subtitleCredit?: string;
 }
 
+// Machine-readable selection returned by Prompt, after domain validation.
+// The real catalogue ID is for navigation; the reason is human-readable model
+// output and remains something the viewer should evaluate.
 export interface Recommendation {
   movieId: string;
   reason: string;

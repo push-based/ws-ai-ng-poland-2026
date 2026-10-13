@@ -9,6 +9,9 @@ export class CaptionTranslationService {
   private readonly translator = inject(TranslatorApi);
   private readonly cache = new Map<string, string[]>();
 
+  // Translate only cue text, preserving its array order. The player still uses
+  // the original start/end times to choose which translated string to display.
+  // Translation cannot create speech or meaningful captions for a silent excerpt.
   translate(
     movie: Movie,
     language: string,

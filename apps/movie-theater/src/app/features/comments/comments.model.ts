@@ -1,4 +1,7 @@
 import { getMovie } from '@nano-cinema/catalogue';
+// Version the key because stored JSON can outlive a release of the app.
+// Parsing it below validates actual records; a TypeScript interface cannot
+// validate old, manually edited or corrupted browser storage at runtime.
 export const COMMENT_STORAGE_KEY = 'nano-cinema.comments.v1';
 export const MAX_COMMENT_LENGTH = 2000;
 export interface MovieComment {

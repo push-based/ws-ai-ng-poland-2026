@@ -18,6 +18,9 @@ export class SummarizerApi {
       'configuration',
       JSON.stringify(configuration),
     );
+    // Summarizer is a task-specific API: type, length and format steer the result
+    // without building our own chat prompt. preference is a performance hint, not
+    // a guaranteed speed or quality level. Check and create with this same options set.
     const options: SummarizerCreateOptions = {
       ...englishTaskOptions,
       ...configuration,
@@ -35,6 +38,8 @@ export class SummarizerApi {
         signal,
       );
     } finally {
+      // This is a one-shot model instance. Always destroy it when the task ends,
+      // including cancellation or an exception, to release browser-managed resources.
       model.destroy();
     }
   }

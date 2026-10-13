@@ -2,6 +2,9 @@ import type { Router } from '@angular/router';
 import type { CinemaService } from '../../cinema.service';
 import type { PageTool } from '../tool.types';
 import { searchMovies } from '@nano-cinema/catalogue';
+// Distinguish inspection/search (read-only hints) from movie selection (changes
+// page state). Descriptions and schemas help a caller choose the right operation;
+// selection opens the route but deliberately does not attempt autoplay.
 export function catalogueTools(
   cinema: CinemaService,
   router: Router,

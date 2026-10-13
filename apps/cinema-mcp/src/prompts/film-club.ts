@@ -14,6 +14,9 @@ export function registerDiscussionPrompt(server: McpServer): void {
         .object({ movieId: z.enum(['sintel', 'bunny', 'dream']) })
         .strict(),
     },
+    // getPrompt returns a message template filled with grounded notes. It does
+    // not answer the discussion questions. A host can review these messages and
+    // then pass them to its own model as a separate inference step.
     ({ movieId }) => {
       const movie = getMovie(movieId);
       return {

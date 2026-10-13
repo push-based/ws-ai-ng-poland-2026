@@ -6,6 +6,9 @@ export class SceneDescriptionService {
   private readonly runtime = inject(AiRuntime);
   private readonly prompt = inject(PromptApi);
 
+  // This is multimodal Prompt inference on one captured frame. It has no access
+  // to the rest of the movie or audio; ask about visible detail, then compare the
+  // answer with the shown image instead of treating inferred plot as observation.
   describe(canvas: HTMLCanvasElement): Promise<string> {
     return this.runtime.run('Prompt', 'image input', (signal) =>
       this.runtime.mode() === 'fixture'

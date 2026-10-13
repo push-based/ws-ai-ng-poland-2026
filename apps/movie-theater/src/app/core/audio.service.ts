@@ -40,6 +40,9 @@ export class AudioService {
 
     if (this.video !== video) {
       this.source?.disconnect();
+      // Web Audio permits only one MediaElementAudioSourceNode per media element.
+      // Cache it, then reconnect that source when needed. Routing can create a new
+      // video element while keeping the filters and mix settings alive.
       let source = this.sources.get(video);
       if (!source) {
         source = context.createMediaElementSource(video);
@@ -61,11 +64,16 @@ export class AudioService {
     this.active.set(false);
   }
 
+  // Human faders and WebMCP calls meet at this boundary. Validate the entire mix
+  // before changing any filter so invalid agent input cannot partially alter sound.
+  // Filter gains use decibels; master volume is a linear 0-to-1 gain.
   apply(value: unknown) {
     const mix = validateAudioMix(value);
     this.mix.set(mix);
     if (this.context && this.gain && this.bass && this.mid && this.treble) {
       const time = this.context.currentTime;
+      // Smooth each parameter toward its target over a short time constant instead
+      // of jumping instantly. Sudden gain changes can produce audible clicks.
       this.bass.gain.setTargetAtTime(mix.bass, time, 0.03);
       this.mid.gain.setTargetAtTime(mix.mid, time, 0.03);
       this.treble.gain.setTargetAtTime(mix.treble, time, 0.03);
@@ -83,6 +91,10 @@ export class AudioService {
     return data;
   }
 
+  // Signal flow: video source → bass → mid → treble → master gain → compressor
+  // → analyser → speakers. These are actual audio processing nodes. The low/high
+  // shelves affect frequencies below/above a cutoff; the peaking filter targets mids.
+  // The compressor reduces peaks, and the analyser measures the processed signal.
   private createGraph() {
     const context = new AudioContext();
     this.context = context;
@@ -98,6 +110,8 @@ export class AudioService {
     this.treble.frequency.value = 4200;
     this.gain = context.createGain();
     this.analyser = context.createAnalyser();
+    // The analyser uses a 256-sample FFT, giving 128 frequency bins. The booth's
+    // bars visualize these measured magnitudes, not a fabricated music animation.
     this.analyser.fftSize = 256;
     const limiter = context.createDynamicsCompressor();
     limiter.threshold.value = -6;

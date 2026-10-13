@@ -41,6 +41,9 @@ export class ConciergeSession {
     this.window.set(0);
   }
 
+  // Reuse the active LanguageModel for follow-up questions: its prior prompts
+  // remain in model context. A new session on every question would lose that
+  // conversation. Reset destroys it so a fresh demo starts with only the catalogue.
   async get(signal: AbortSignal): Promise<LanguageModel> {
     if (!this.active) {
       this.active = await this.prompt.create(signal, [
@@ -51,6 +54,8 @@ export class ConciergeSession {
     return this.active;
   }
 
+  // Read the browser's reported context usage and window size. These values
+  // describe the session's finite input context, not paid API usage or a cloud bill.
   refreshUsage() {
     this.usage.set(this.active?.contextUsage ?? 0);
     this.window.set(this.active?.contextWindow ?? 0);
@@ -68,6 +73,9 @@ export class ConciergeSession {
 
   async clone(signal: AbortSignal) {
     const original = await this.get(signal);
+    // clone() branches the existing model context. Subsequent prompts use the clone;
+    // the original is retained separately and receives none of those later turns.
+    // Both instances must eventually be destroyed, even if only one is active.
     const cloned = await original.clone({ signal });
     if (signal.aborted) {
       cloned.destroy();
@@ -95,6 +103,9 @@ export class ConciergeSession {
     this.refreshUsage();
   }
 
+  // contextoverflow warns that older context may be evicted as the window fills.
+  // We expose it in the trace so participants can compare automatic eviction
+  // with explicit, lossy summary-based compaction.
   private observe(session: LanguageModel) {
     session.addEventListener('contextoverflow', () =>
       this.runtime.trace(

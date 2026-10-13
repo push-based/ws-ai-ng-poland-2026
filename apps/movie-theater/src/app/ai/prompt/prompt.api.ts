@@ -18,6 +18,10 @@ export class PromptApi {
     await this.runtime.require('Prompt', () =>
       LanguageModel.availability(options),
     );
+    // create() allocates a conversational session and may download its model.
+    // initialPrompts seed its context (for example, our catalogue/system instruction).
+    // Return this session to its owner: the concierge keeps it for follow-up turns,
+    // whereas a one-shot image request destroys it after producing its answer.
     const session = await LanguageModel.create({
       ...options,
       signal,
@@ -36,6 +40,9 @@ export class PromptApi {
     canvas: HTMLCanvasElement,
     signal: AbortSignal,
   ): Promise<string> {
+    // Text availability does not imply image-input availability. This session
+    // explicitly declares both text and image input; the actual canvas is provided
+    // as image content, not as a filename or an instruction to imagine a scene.
     const session = await this.create(signal, [], {
       ...englishPromptOptions,
       expectedInputs: [{ type: 'text', languages: ['en'] }, { type: 'image' }],
@@ -61,6 +68,8 @@ export class PromptApi {
         signal,
       );
     } finally {
+      // This image session has no follow-up conversation, so release it here. The
+      // long-lived concierge follows the different ownership contract in create().
       session.destroy();
     }
   }

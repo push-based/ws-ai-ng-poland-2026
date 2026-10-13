@@ -1,3 +1,5 @@
+// Fixture checks verify deterministic examples and cue alignment. They do not
+// claim native API availability or inference correctness on a participant's device.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { movies, getMovie } from '@nano-cinema/catalogue';

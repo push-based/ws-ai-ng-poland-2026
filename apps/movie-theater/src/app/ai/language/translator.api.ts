@@ -23,6 +23,9 @@ export class TranslatorApi {
     if (sourceLanguage === targetLanguage) return [...texts];
     if (typeof Translator === 'undefined')
       throw new Error('Translator API is not exposed.');
+    // Translation models are selected by source/target language pair. Preparing
+    // English-to-Polish does not establish support for every other pair. We check
+    // this exact pair each time we create a translator; no cloud service is called.
     const options = {
       sourceLanguage,
       targetLanguage,
@@ -40,12 +43,17 @@ export class TranslatorApi {
     const model = await Translator.create(options);
     try {
       const translated: string[] = [];
+      // Reuse the same translator for the batch and keep cue order intact. Each
+      // input text produces one output text; timestamps live elsewhere and are never
+      // sent to the model. Sequential calls make cancellation between cues explicit.
       for (const text of texts) {
         signal.throwIfAborted();
         translated.push(await model.translate(text, { signal }));
       }
       return translated;
     } finally {
+      // This is a one-shot model instance. Always destroy it when the task ends,
+      // including cancellation or an exception, to release browser-managed resources.
       model.destroy();
     }
   }
