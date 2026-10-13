@@ -3,14 +3,17 @@
 ## Before the workshop
 
 1. Install dependencies, install ffmpeg/ffprobe and unzip, run `pnpm media:download`, then run `pnpm build`, `pnpm lint`, `pnpm test`.
-2. Start the app, open AI Inspector and check capabilities for the actual device.
+2. Start the app, open `/preflight`, check exact-task capabilities and copy the diagnostics for the actual device. AI Inspector remains available in the cinema.
 3. Prepare Prompt and try a native request. Prepare the en → pl Translator by changing caption language, then repeat in native mode to verify it is cached.
 4. Exercise Summarizer, image input and the optional writing APIs independently.
 5. Enable WebMCP in the workshop Chrome profile and verify native tool discovery and calls with the inspector for that build.
 6. Play all three clips, check audio, seek, and test caption timing.
 7. Test the compiled MCP server in the intended host or use `pnpm nx test cinema-mcp` for the wire-level smoke test.
 8. Recheck official Chrome/Angular/MCP documentation one week before class. Record browser version, repository commit, API availability and which optional demos were tested.
-9. Test the app with the network disconnected only after dependencies and browser models have downloaded. Keep the local server running.
+9. For the optional BYOM/WebGPU comparison, run `pnpm onnx:download`, enable detection manually, scan a frame, then disable it. Live tracking is a separate opt-in; core exercises do not depend on it.
+10. Run **local agent evaluations** on `/preflight`, inspect actual calls/slider values and copy the report. Also rehearse the [agent evaluation scenarios](EVALUATION.md) with any external caller you intend to demonstrate.
+11. Test the app with the network disconnected only after dependencies and browser models have downloaded. Keep the local server running.
+12. Complete the [handbook coverage/rehearsal gates](HANDBOOK-COVERAGE.md). Share the `/preflight` URL with remote attendees; its diagnostics contain capability metadata, not conversation or comment text.
 
 ## The day, in one app
 

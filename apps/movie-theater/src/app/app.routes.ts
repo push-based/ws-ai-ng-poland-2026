@@ -15,5 +15,12 @@ export const appRoutes: Routes = [
         (module) => module.Screening,
       ),
   },
+  {
+    path: 'preflight',
+    loadComponent: () =>
+      import('./features/preflight/preflight').then(
+        (module) => module.Preflight,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];

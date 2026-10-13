@@ -13,10 +13,34 @@ export function audioTools(cinema: CinemaService, router: Router): PageTool[] {
       inputSchema: {
         type: 'object',
         properties: {
-          bass: { type: 'number', minimum: -12, maximum: 12 },
-          mid: { type: 'number', minimum: -12, maximum: 12 },
-          treble: { type: 'number', minimum: -12, maximum: 12 },
-          volume: { type: 'number', minimum: 0, maximum: 1 },
+          bass: {
+            type: 'number',
+            minimum: -12,
+            maximum: 12,
+            description:
+              'Bass shelf gain in dB. Reject out-of-range requests; never substitute a different value.',
+          },
+          mid: {
+            type: 'number',
+            minimum: -12,
+            maximum: 12,
+            description:
+              'Midrange peak gain in dB. Use the explicitly requested value.',
+          },
+          treble: {
+            type: 'number',
+            minimum: -12,
+            maximum: 12,
+            description:
+              'Treble shelf gain in dB. Use the explicitly requested value.',
+          },
+          volume: {
+            type: 'number',
+            minimum: 0,
+            maximum: 1,
+            description:
+              'Linear master gain from 0 to 1; 70 percent is 0.7. Does not unlock playback.',
+          },
         },
         required: ['bass', 'mid', 'treble', 'volume'],
         additionalProperties: false,

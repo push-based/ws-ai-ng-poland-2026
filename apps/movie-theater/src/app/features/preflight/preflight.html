@@ -1,0 +1,157 @@
+<section class="preflight">
+  <a routerLink="/" class="text-link">← Back to cinema</a>
+  <span class="eyebrow">DEVICE READINESS</span>
+  <h1>Ready for local AI?</h1>
+  <p class="intro">
+    Check the exact tasks on this device, prepare a model, and share a
+    capability report. No comments or conversation text are included.
+  </p>
+  <div class="actions">
+    <button
+      class="button primary"
+      (click)="preflight.check()"
+      [disabled]="preflight.checking() || evaluation.running()"
+    >
+      {{ preflight.checking() ? 'Checking…' : 'Check this device' }}
+    </button>
+    <button
+      class="button secondary"
+      (click)="prepare()"
+      [disabled]="runtime.busy() || evaluation.running()"
+    >
+      Prepare Prompt model
+    </button>
+    <button
+      class="button secondary"
+      (click)="fixtures()"
+      [disabled]="runtime.busy() || evaluation.running()"
+    >
+      Use fixtures
+    </button>
+  </div>
+  @if (runtime.busy()) {
+    <p role="status">
+      Preparing… {{ (runtime.progress() * 100).toFixed(0) }}%
+      <button (click)="runtime.stop()">Cancel</button>
+    </p>
+  }
+  @if (preparationError()) {
+    <p class="error" role="alert">{{ preparationError() }}</p>
+  }
+  @if (preflight.checkedAt()) {
+    <p class="micro">
+      Last checked: {{ preflight.checkedAt() }} · available means a session can
+      be created, not that every inference has passed.
+    </p>
+  }
+  <div class="checks">
+    @for (check of preflight.checks(); track check.name) {
+      <article class="panel check" [attr.data-readiness]="check.readiness">
+        <div>
+          <h2>{{ check.name }}</h2>
+          <p>{{ check.task }}</p>
+        </div>
+        <span class="badge">{{ check.state }}</span>
+      </article>
+    } @empty {
+      <p class="panel empty">
+        Not checked yet. Click Check this device; opening this page does not
+        download a model.
+      </p>
+    }
+  </div>
+  <p class="legend">
+    Green: available · Amber: preparation needed · Red: unsupported/error ·
+    Unchecked is not a failure.
+  </p>
+  <details class="panel report">
+    <summary>Copyable diagnostics</summary>
+    <button class="button secondary small" (click)="copy('diagnostics')">
+      Copy diagnostics
+    </button>
+    <textarea
+      aria-label="Diagnostics JSON"
+      readonly
+      [value]="diagnostics()"
+    ></textarea>
+  </details>
+  <p class="micro">
+    For model storage/hardware issues use chrome://on-device-internals. This
+    page does not guess free disk space or VRAM. ONNX setup is separate: pnpm
+    onnx:download.
+  </p>
+  <section class="panel evaluations">
+    <span class="eyebrow">MODEL-FACING CHECKS</span>
+    <h2>Can a local agent use the tools?</h2>
+    <p>
+      A real Prompt API session chooses each action from browser-discovered
+      tools, calls native WebMCP, sees results/errors, and is graded against
+      observed state. No cloud model or scripted fixture planner.
+    </p>
+    <p class="micro">
+      This run opens movies and changes their reversible mix/seek state. Six
+      cases check reading, arguments, rejected gain, no unrequested action,
+      seeking and a multi-tool journey. Inference requires a supported Prompt
+      model and native WebMCP.
+    </p>
+    <div class="actions">
+      <button
+        class="button primary"
+        (click)="evaluation.runAll()"
+        [disabled]="evaluation.running() || runtime.busy()"
+      >
+        Run local agent evaluations
+      </button>
+      @if (evaluation.running()) {
+        <button class="button secondary" (click)="evaluation.stop()">
+          Stop evaluations
+        </button>
+      }
+      @if (evaluation.results().length) {
+        <button class="button secondary" (click)="copy('evaluation')">
+          Copy evaluation report
+        </button>
+      }
+    </div>
+    @if (evaluation.running()) {
+      <p role="status">
+        Running: {{ evaluation.current() }}. Tool navigation may show a movie
+        while the root-owned runner continues. Return to /preflight for results.
+      </p>
+    }
+    @if (evaluation.error()) {
+      <p class="error" role="alert">{{ evaluation.error() }}</p>
+    }
+    @if (evaluation.results().length) {
+      <p role="status">
+        {{ passed() }} / {{ evaluation.results().length }} cases passed
+      </p>
+      @for (result of evaluation.results(); track result.id) {
+        <details class="evaluation-result" [attr.data-status]="result.status">
+          <summary>{{ result.status }} · {{ result.request }}</summary>
+          <p>{{ result.detail }}</p>
+          <p>{{ result.answer }}</p>
+          @for (call of result.calls; track $index) {
+            <p>
+              <code>{{ call.name }}</code>
+              @if (call.error) {
+                <span class="error">{{ call.error }}</span>
+              }
+            </p>
+          }
+        </details>
+      }
+      <details>
+        <summary>Full evaluation evidence</summary>
+        <textarea
+          aria-label="Evaluation JSON"
+          readonly
+          [value]="evaluationReport()"
+        ></textarea>
+      </details>
+    }
+  </section>
+  @if (copied()) {
+    <p role="status">{{ copied() }}</p>
+  }
+</section>

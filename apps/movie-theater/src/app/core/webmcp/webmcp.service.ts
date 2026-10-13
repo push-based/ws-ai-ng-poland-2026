@@ -1,4 +1,10 @@
-import { Injectable, inject, signal, DestroyRef } from '@angular/core';
+import {
+  Injectable,
+  inject,
+  signal,
+  DestroyRef,
+  ApplicationRef,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ModelContext } from './tool.types';
 import { catalogueTools } from './tools/catalogue.tools';
@@ -23,10 +29,12 @@ export class WebmcpService {
   readonly log = signal<{ name: string; args: string; result: string }[]>([]);
   private readonly cinema = inject(CinemaService);
   private readonly router = inject(Router);
+  private readonly application = inject(ApplicationRef);
   private readonly controller = new AbortController();
   // WebMCP exposes operations inside the running page. These handlers access
   // the live player/audio state. The separate Node MCP companion only exposes
   // catalogue information and cannot control this page's audio graph.
+  private registration?: Promise<void>;
   readonly tools = [
     ...catalogueTools(this.cinema, this.router),
     ...audioTools(this.cinema, this.router),
@@ -39,6 +47,26 @@ export class WebmcpService {
 
   /** Register domain operations once and unregister them with the Angular injection lifecycle. */
   async register() {
+    // Shell startup and preflight can ask together. Share the in-flight registration
+    // so the browser never sees two attempts to register the same tool name.
+    if (!this.registration) this.registration = this.registerTools();
+    try {
+      await this.registration;
+    } finally {
+      this.registration = undefined;
+    }
+  }
+
+  async discoverNative() {
+    const context = modelContext();
+    if (!context?.getTools)
+      throw new Error('document.modelContext.getTools is unavailable.');
+    const tools = toolMetadata(await context.getTools());
+    this.discovered.set(tools);
+    return tools;
+  }
+
+  private async registerTools() {
     const context = modelContext();
     if (!context) {
       this.error.set(
@@ -99,6 +127,10 @@ export class WebmcpService {
           ...items,
         ].slice(0, 12),
       );
+      // A browser/agent callback can resolve before Angular has rendered the signal
+      // change. Wait for the scheduled render before acknowledging success so a
+      // caller inspecting sliders immediately after the reply sees the applied mix.
+      await this.application.whenStable();
       // Return structured tool-result content, with a JSON text payload describing
       // the actual outcome. This is evidence for the caller, not a model-written reply.
       return { content: [{ type: 'text', text: JSON.stringify(result) }] };

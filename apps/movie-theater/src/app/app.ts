@@ -12,6 +12,7 @@ import { CinemaService } from './core/cinema.service';
 import { InspectorState } from './core/inspector-state.service';
 import { WebmcpService } from './core/webmcp/webmcp.service';
 import { AiInspector } from './features/inspector/inspector';
+import { EvaluationService } from './features/evaluation/evaluation.service';
 import { AiRuntime } from './ai/ai-runtime.service';
 import { CapabilitiesService } from './ai/capabilities.service';
 
@@ -29,6 +30,7 @@ import { CapabilitiesService } from './ai/capabilities.service';
   styleUrl: './app.css',
 })
 export class App {
+  readonly evaluation = inject(EvaluationService);
   readonly cinema = inject(CinemaService);
   readonly runtime = inject(AiRuntime);
   readonly capabilities = inject(CapabilitiesService);

@@ -70,3 +70,13 @@
   ></button
   ><app-ai-inspector (dismiss)="closeInspector()" />
 }
+
+@if (evaluation.running()) {
+  <aside
+    class="evaluation-progress"
+    aria-label="Local agent evaluation progress"
+  >
+    <span role="status">Local agent check: {{ evaluation.current() }}</span>
+    <button (click)="evaluation.stop()">Stop evaluations</button>
+  </aside>
+}

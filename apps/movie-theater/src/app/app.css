@@ -276,3 +276,24 @@ footer > button {
   background-position: right 8px center;
   background-size: 12px;
 }
+
+.evaluation-progress {
+  position: fixed;
+  z-index: 100;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 16px 24px;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--amber);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 8px 40px #0008;
+  font-size: 13px;
+}
+.evaluation-progress button {
+  white-space: nowrap;
+}

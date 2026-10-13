@@ -1,6 +1,19 @@
-# Verification snapshot · 12 October 2026
+# Verification record
 
-## Automated checks
+## Current reference app · 13 October 2026
+
+Build, lint and all **26 tests** passed across the three Nx projects after adding preflight and local-agent evaluation. Prettier and Git diff checks passed. The preceding source-teaching-comment pass also passed its 22-test suite.
+The comment pass emitted identical JavaScript with comments removed; it did not alter application behavior.
+Native movie-feature evidence below is from **12 October**; preflight/native agent checks were added on **13 October**, in the existing Chrome 154 experimental-API profile. This is not a clean-profile or remote-device rehearsal.
+
+Current behavior: routed movie/side-panel URLs, home-only concierge, local comments with reviewable writing suggestions, sourced dialogue subtitles, and opt-in worker-based ONNX/WebGPU detection.
+The final application update at the end records that verification. The original baseline entries below are retained as history and include older counts/UI terminology.
+
+A clean exported checkout installed from the frozen lockfile, downloaded original media/model assets, generated clips/posters and passed build/lint/all 26 tests with no Nx cache hits. Clean-profile cold downloads and remote-attendee rehearsals remain to be done on those actual devices. See [coverage gaps](HANDBOOK-COVERAGE.md) and [evaluation scenarios](EVALUATION.md).
+
+## Original baseline · 12 October 2026
+
+### Automated checks
 
 `pnpm nx run-many -t build lint test` passed for all three projects.
 The suite contains **12 tests**: four catalogue/domain checks, six browser-side fixture/compatibility checks, and two real MCP stdio integration tests.
@@ -9,7 +22,7 @@ MCP tests assert modern (`2026-*`) and legacy (`2025-*`) negotiated revisions, t
 All three bundled MP4 files have video and audio streams and a duration of 30 seconds; the complete media directory is approximately 9.3 MB.
 The production app's initial JS/CSS totals approximately 461 kB raw / 108 kB estimated transfer, within the configured budget.
 
-## Browser smoke tests
+### Browser smoke tests
 
 Tested in the existing macOS Chrome profile reporting **Chrome 154.0.0.0**.
 This profile already exposes the experimental APIs/WebMCP; no browser flags were changed by this implementation.
@@ -73,3 +86,19 @@ Generated runtime assets are excluded from both Git and source linting; they are
 The detector runtime and page components are lazy chunks; the initial production JS/CSS is approximately 373 kB raw / 89 kB estimated transfer, within the original budget.
 
 The expanded suite contains 22 tests across the three Nx projects, including cancellation/late model ownership, local comment storage, detection decoding, and zero-work-before-opt-in lifecycle checks.
+
+## Preflight and local caller · 13 October 2026
+
+`/preflight` checked all seven AI APIs, Prompt image input, the reverse Polish-to-English pair, native WebMCP registration/discovery and a real WebGPU adapter. Diagnostics copied successfully and exported no comments/conversation content.
+The browser discovered six imperative tools through **document.modelContext**. Undefined navigator.modelContext/modelContextTesting would be an incorrect support test for this implementation.
+
+The local Prompt evaluation runner used typed structured argument objects and real native page-tool execution. Read, mixer extraction, negative-action handling, seek and ordered movie/mix journeys were exercised; actual slider values were compared with reported state. Cancellation returned to preflight with “Evaluation cancelled.”
+
+Two consecutive final-development runs scored **5/6**, with different failures: one model replaced a requested 99 dB with 9 dB; after clearer descriptions/instructions, another model completed a seek and then performed unrelated movie/subtitle actions. Both were correctly failed. These are observed probabilistic caller errors, not reported successes or fixture substitutions. The successful mix case rendered exactly -5/+4/+2 dB and 65%, agreeing with the tool's state.
+The first runner's JSON-inside-a-string bug was fixed with a typed arguments object, including valid empty arguments for a state read; regression tests cover that contract.
+
+A successful run on one profile would not establish reliable agent behavior across participants. Keep the failed-case evidence and rerun in the actual workshop environment.
+
+The already-loaded home page was tested with **tab-scoped CDP offline network emulation** after model/assets preparation. Native concierge inference returned Big Buck Bunny with a validated ID and reported 348/9216 context tokens. Networking was restored afterwards. This verifies prepared-page behavior under browser network emulation, not an OS-wide disconnect or a fresh-profile download.
+
+The explicit fixture path also completed while the tab was offline, returning the labelled Elephants Dream fixture with simulated context. Both offline overrides were removed. Preflight's 390×844 layout had document width equal to viewport width (390), with no horizontal overflow; the temporary viewport was reset.

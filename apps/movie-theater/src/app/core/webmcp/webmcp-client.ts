@@ -2,7 +2,7 @@
 export interface DiscoveredTool {
   name: string;
   description?: string;
-  inputSchema?: Record<string, unknown>;
+  inputSchema?: Record<string, unknown> | string;
   [key: string]: unknown;
 }
 export interface NativeToolExecutor {
