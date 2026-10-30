@@ -1,0 +1,15 @@
+<app-lab-frame [exerciseId]="exerciseId()">
+  <section class="panel lab-card">
+    <h2>This exercise runs in your terminal</h2>
+    <p>
+      MCP servers and clients are Node processes that talk over stdin/stdout.
+      There is nothing to click here: open the files listed above in your editor
+      and run these commands from the repository root.
+    </p>
+    <ol class="lab-output code">
+      @for (command of commands(); track command) {
+        <li>{{ command }}</li>
+      }
+    </ol>
+  </section>
+</app-lab-frame>

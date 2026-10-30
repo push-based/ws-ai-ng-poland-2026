@@ -1,0 +1,117 @@
+<app-lab-frame exerciseId="1-4" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Can this browser offer the AI version?</h2>
+      @if (enhancement(); as enhancement) {
+        <span class="lab-badge" [attr.data-state]="enhancement">{{
+          enhancement === 'ai' ? 'AI available' : 'Basic only'
+        }}</span>
+      }
+    </div>
+    <p>
+      Step 1: <em>progressive enhancement</em> means the core feature (a short
+      description of each film) works in every browser. AI makes it better where
+      it is supported; it is never required.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="detect()"
+        [disabled]="log.busy()"
+      >
+        Check this browser
+      </button>
+      <label class="inline"
+        ><input
+          type="checkbox"
+          [checked]="pretendNoAi()"
+          (change)="togglePretend($event)"
+        />
+        Pretend this browser has no AI</label
+      >
+    </div>
+    <p class="micro">
+      The switch hides the <code>Summarizer</code> global while your code runs,
+      which is what your code would see in a browser without the API.
+    </p>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · The basic version</h2>
+    <p>
+      Step 2: the fallback needs no model at all: it keeps the first sentences
+      of the programme notes for <em>{{ movies[0].title }}</em
+      >.
+    </p>
+    <div class="lab-row">
+      <label
+        >Sentences
+        <input
+          type="number"
+          min="1"
+          max="10"
+          [value]="maxSentences()"
+          (input)="setMaxSentences($event)"
+      /></label>
+      <button
+        class="button secondary small"
+        (click)="showExcerpt()"
+        [disabled]="log.busy()"
+      >
+        Show basicExcerpt()
+      </button>
+    </div>
+    @if (excerpt()) {
+      <div class="lab-output">{{ excerpt() }}</div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>C · Short versions of the programme notes</h2>
+      <button
+        class="button primary small"
+        (click)="shortenAll()"
+        [disabled]="log.busy()"
+      >
+        Shorten all three
+      </button>
+    </div>
+    <p>
+      Step 3: <code>shortDescription()</code> tries the Summarizer and falls
+      back to the basic excerpt on any failure. The badge tells you which one
+      you got. Switch on "Pretend this browser has no AI" and try again: every
+      card still gets a short version.
+    </p>
+    <div class="lab-grid">
+      @for (movie of movies; track movie.id) {
+        <article class="lab-card panel">
+          <h3>{{ movie.title }} ({{ movie.year }})</h3>
+          <p class="micro">
+            {{ movie.genre }} · programme notes:
+            {{ notes(movie).length }} characters
+          </p>
+          <button
+            class="button secondary small"
+            (click)="shorten(movie)"
+            [disabled]="log.busy()"
+          >
+            Short version
+          </button>
+          @if (results()[movie.id]; as result) {
+            <p>
+              <span class="lab-badge" [attr.data-state]="result.source">{{
+                result.source === 'ai' ? 'AI summary' : 'Basic excerpt'
+              }}</span>
+            </p>
+            <div class="lab-output">{{ result.text }}</div>
+          }
+        </article>
+      }
+    </div>
+    <p class="micro">
+      Native Chrome: if the Summarizer model still needs downloading, the first
+      click starts that download, so the first answer can take a while.
+    </p>
+  </section>
+</app-lab-frame>

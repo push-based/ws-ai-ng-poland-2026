@@ -1,0 +1,159 @@
+<app-lab-frame exerciseId="3-3" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · A document that may not fit</h2>
+    <p>
+      All programme notes and dialogue of our three movies, as one document
+      (given in the starter). A summarizer only accepts a limited amount of
+      input, its <code>inputQuota</code>, counted in tokens.
+    </p>
+    <div class="lab-row">
+      <span class="lab-badge">{{ document.length }} characters</span>
+      <span class="lab-badge">{{ paragraphCount }} paragraphs</span>
+      <span class="lab-badge">≈ {{ roughTokens }} tokens (characters ÷ 4)</span>
+    </div>
+    <details>
+      <summary>Show the document</summary>
+      <div class="lab-output">{{ document }}</div>
+    </details>
+    <label class="inline">
+      <input type="checkbox" [checked]="tiny()" (change)="setTiny($event)" />
+      Simulate a tiny quota of {{ tinyQuota }} tokens
+    </label>
+    <p class="micro">
+      Chrome's real quota may be large enough for this whole document. The tiny
+      quota is passed to your code as <code>quotaOverride</code>, so you can
+      watch the chunking anyway. In simulated mode the fake summarizer enforces
+      the same {{ tinyQuota }} tokens (otherwise 1024).
+    </p>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Measure before you send</h2>
+    <p>
+      Step 1: <code>measureInputUsage()</code> counts the tokens of this text
+      for this model; <code>fitsInQuota()</code> compares it with the quota.
+      Then try the naive way: everything in one call.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="measure()"
+        [disabled]="running()"
+      >
+        Measure the document
+      </button>
+      <button
+        class="button secondary small"
+        (click)="oneCall()"
+        [disabled]="running()"
+      >
+        Summarize in one call (no chunking)
+      </button>
+    </div>
+    @if (budget(); as budget) {
+      <div class="lab-row">
+        <span
+          class="lab-badge"
+          [attr.data-state]="budget.fits ? 'ok' : 'error'"
+          >{{ budget.fits ? 'Fits' : 'Too large' }}</span
+        >
+        <span class="micro"
+          >{{ budget.usage }} of {{ budget.quota }} tokens</span
+        >
+      </div>
+      <div class="lab-meter" aria-label="Input usage">
+        <span [style.width.%]="percent(budget)"></span>
+      </div>
+    }
+    <p class="micro">
+      A one-call request that is too large fails with a
+      <code>QuotaExceededError</code> (see the event log). A pretend quota only
+      changes what your code decides; the real model still accepts up to its
+      real quota.
+    </p>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Split into chunks</h2>
+    <p>
+      Step 2: cut at paragraph boundaries, fall back to sentences and then to
+      whole words, and pack neighbours together up to the limit. Try a small
+      limit (for example 150) to see the sentence fallback.
+    </p>
+    <div class="lab-row">
+      <label
+        >Max characters per chunk
+        <input
+          type="number"
+          min="20"
+          [value]="maxChars()"
+          (input)="setMaxChars($event)"
+      /></label>
+      <button class="button secondary small" (click)="split()">
+        Split the document
+      </button>
+    </div>
+    @if (chunks().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Characters</th>
+            <th>Starts with</th>
+            <th>Ends with</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (chunk of chunks(); track $index) {
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td>{{ chunk.length }}</td>
+              <td>{{ chunk.slice(0, 50) }}…</td>
+              <td>…{{ chunk.slice(-40) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>D · Summary of summaries</h2>
+    <p>
+      Steps 3–4: summarize every chunk as key points, join the results and
+      repeat until the text fits; then write one final summary. Each round only
+      sees the previous summaries, never the original text, so details can get
+      lost. Compare the result with the document above.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="summarize()"
+        [disabled]="running()"
+      >
+        Summarize the whole document
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+    </div>
+    @if (stages().length) {
+      <ol>
+        @for (stage of stages(); track $index) {
+          <li>
+            <strong>{{ stage.name }}</strong>
+            <div class="lab-output">{{ stage.detail }}</div>
+          </li>
+        }
+      </ol>
+    }
+    @if (summary()) {
+      <h3>Final summary</h3>
+      <div class="lab-output">{{ summary() }}</div>
+    }
+  </section>
+</app-lab-frame>

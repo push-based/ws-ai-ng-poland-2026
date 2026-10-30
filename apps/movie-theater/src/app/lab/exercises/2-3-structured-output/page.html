@@ -1,0 +1,128 @@
+<app-lab-frame exerciseId="2-3" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · The shape we ask for</h2>
+    <p>
+      Step 1: a JSON schema describes the answer. The browser uses it to
+      constrain what the model can write, so <code>movieId</code> can only be
+      one of the three real IDs.
+    </p>
+    <button class="button secondary small" (click)="showSchema()">
+      Preview recommendationSchema()
+    </button>
+    @if (schemaPreview()) {
+      <pre class="lab-output code">{{ schemaPreview() }}</pre>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Ask for a recommendation</h2>
+    <p>
+      Steps 2–3: <code>askForJson()</code> returns text that follows the schema;
+      <code>parseRecommendation()</code> turns it into data the app can act on,
+      or rejects it. Try "Ask without a schema" to see why the constraint
+      matters.
+    </p>
+    <div class="lab-row">
+      <label class="lab-grow"
+        >What would you like to watch?
+        <input
+          [value]="request()"
+          (input)="setRequest($event)"
+          (keydown.enter)="recommend()"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="recommend()"
+        [disabled]="log.busy()"
+      >
+        Recommend (with schema)
+      </button>
+      <button
+        class="button secondary small"
+        (click)="askWithoutSchema()"
+        [disabled]="log.busy()"
+      >
+        Ask without a schema
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!log.busy()"
+      >
+        Stop
+      </button>
+    </div>
+    <div class="lab-row">
+      @for (suggestion of suggestions; track suggestion) {
+        <button
+          class="button secondary small"
+          (click)="request.set(suggestion)"
+        >
+          {{ suggestion }}
+        </button>
+      }
+    </div>
+
+    @if (raw()) {
+      <p class="micro">{{ rawLabel() }}</p>
+      <pre class="lab-output code">{{ raw() }}</pre>
+    }
+
+    @if (result(); as result) {
+      <div class="lab-output">
+        <span class="lab-badge" data-state="ok">Validated</span>
+        <h3>
+          {{ result.movie.title }} · {{ result.movie.genre }} ·
+          {{ result.movie.year }}
+        </h3>
+        <p>{{ result.recommendation.reason }}</p>
+        <a
+          class="button primary small"
+          [routerLink]="['/movies', result.recommendation.movieId]"
+          >Open movie</a
+        >
+      </div>
+      <p class="micro">
+        The ID is checked against the catalogue, so the link always works. The
+        reason is still model text: it can be wrong, and the viewer should judge
+        it.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Valid JSON is not the same as valid data</h2>
+    <p>
+      Step 3: these are answers a model, an old app version or an attacker could
+      send. Only one of them is safe to act on. Your
+      <code>parseRecommendation()</code> should reject the rest.
+    </p>
+    <button class="button secondary small" (click)="checkSamples()">
+      Run parseRecommendation() on these answers
+    </button>
+    <table>
+      <tr>
+        <th>Answer</th>
+        <th>Result</th>
+      </tr>
+      @for (sample of samples; track sample; let i = $index) {
+        <tr>
+          <td>
+            <code>{{ sample }}</code>
+          </td>
+          <td>
+            @if (verdicts()[i]; as verdict) {
+              <span
+                class="lab-badge"
+                [attr.data-state]="verdict.accepted ? 'ok' : 'error'"
+                >{{ verdict.detail }}</span
+              >
+            } @else {
+              <span class="micro">not checked yet</span>
+            }
+          </td>
+        </tr>
+      }
+    </table>
+  </section>
+</app-lab-frame>

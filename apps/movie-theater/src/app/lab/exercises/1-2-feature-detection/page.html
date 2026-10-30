@@ -1,0 +1,132 @@
+<app-lab-frame exerciseId="1-2" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · Which AI APIs does this browser expose?</h2>
+    <p>
+      Step 1: <em>feature detection</em> only asks whether the global (for
+      example <code>LanguageModel</code>) exists. It says nothing yet about
+      whether this device can run a model. Toggle the simulation above and check
+      again.
+    </p>
+    <button class="button primary small" (click)="checkGlobals()">
+      Check the globals
+    </button>
+    @if (exposed().length) {
+      <div class="lab-row">
+        @for (row of exposed(); track row.name) {
+          <span
+            class="lab-badge"
+            [attr.data-state]="row.exposed ? 'available' : 'missing'"
+            >{{ row.name }} · {{ row.exposed ? 'exposed' : 'missing' }}</span
+          >
+        }
+      </div>
+    }
+    <p>
+      Step 2: <code>checkApi()</code> turns any failure into a row instead of an
+      exception. Try it with a check that always throws.
+    </p>
+    <button class="button secondary small" (click)="tryFailingCheck()">
+      Run a failing check
+    </button>
+    @if (demoRow(); as row) {
+      <div class="lab-output">
+        <span class="lab-badge" [attr.data-state]="row.status">{{
+          row.status
+        }}</span>
+        {{ row.api }} · {{ row.detail }}
+      </div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Capability matrix</h2>
+    <p>
+      Steps 3–5: ask every API whether it can run
+      <strong>these exact options</strong> on this device. The Prompt API is
+      checked twice (text, then text + image), and the translator once per
+      language pair.
+    </p>
+    <div class="lab-row">
+      <label
+        >Translate from
+        <select (change)="pick('source', $event)">
+          @for (language of languages; track language.code) {
+            <option
+              [value]="language.code"
+              [selected]="language.code === source()"
+            >
+              {{ language.name }} ({{ language.code }})
+            </option>
+          }
+        </select>
+      </label>
+      <label
+        >to
+        <select (change)="pick('target', $event)">
+          @for (language of languages; track language.code) {
+            <option
+              [value]="language.code"
+              [selected]="language.code === target()"
+            >
+              {{ language.name }} ({{ language.code }})
+            </option>
+          }
+        </select>
+      </label>
+      <button
+        class="button primary small"
+        (click)="runAll()"
+        [disabled]="log.busy()"
+      >
+        Run all checks
+      </button>
+    </div>
+    @if (rows().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Options checked</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track $index) {
+            <tr>
+              <td>
+                <code>{{ row.api }}</code>
+              </td>
+              <td>{{ row.detail }}</td>
+              <td>
+                <span class="lab-badge" [attr.data-state]="row.status">{{
+                  row.status
+                }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    <h3>What the states mean</h3>
+    <table>
+      <tbody>
+        @for (item of legend; track item.state) {
+          <tr>
+            <td>
+              <span class="lab-badge" [attr.data-state]="item.state">{{
+                item.state
+              }}</span>
+            </td>
+            <td>{{ item.text }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <p class="micro">
+      Native Chrome: open <code>chrome://on-device-internals</code> to see the
+      device's model status and downloads. Simulation: image input reports the
+      same state as text, the translator knows en, pl, de, es and fr, and the
+      summarizer en, es and ja.
+    </p>
+  </section>
+</app-lab-frame>

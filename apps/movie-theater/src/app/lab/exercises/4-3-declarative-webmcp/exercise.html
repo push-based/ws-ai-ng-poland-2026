@@ -1,0 +1,50 @@
+<!--
+  Exercise 4.3 · Declarative WebMCP
+  Guide: workshop/exercises/4-3-declarative-webmcp.md
+
+  Steps 1–3 happen in THIS file: add WebMCP attributes to a normal HTML form.
+  Steps 4–5 are in exercise.ts. Check your work: pnpm lab:check 4-3
+
+  `novalidate` is on purpose: our code validates (Step 4), so an agent gets a
+  readable reason instead of a silently blocked submission.
+-->
+<!-- TODO Step 1: give the <form> a toolname="reserve_seats" and a tooldescription="…". -->
+<!-- TODO Step 3: decide who presses Submit: add toolautosubmit to the <form>. -->
+<form novalidate (submit)="submitted.emit($event)">
+  <div class="lab-grid">
+    <div>
+      <label for="reserve-movie">Film</label>
+      <!-- TODO Step 2: add toolparamdescription="…" to this <select>. -->
+      <select id="reserve-movie" name="movieId" required>
+        <option value="sintel">Sintel</option>
+        <option value="bunny">Big Buck Bunny</option>
+        <option value="dream">Elephants Dream</option>
+      </select>
+    </div>
+    <div>
+      <label for="reserve-seats">Seats (1–6)</label>
+      <!-- TODO Step 2: add toolparamdescription="…" to this <input>. -->
+      <input
+        id="reserve-seats"
+        name="seats"
+        type="number"
+        min="1"
+        max="6"
+        value="2"
+        required
+      />
+    </div>
+    <div>
+      <label for="reserve-showtime">Showtime</label>
+      <!-- TODO Step 2: add toolparamdescription="…" to this <select>. -->
+      <select id="reserve-showtime" name="showtime" required>
+        <option value="18:00">18:00</option>
+        <option value="20:30">20:30</option>
+        <option value="22:45">22:45</option>
+      </select>
+    </div>
+  </div>
+  <p class="lab-row">
+    <button class="button primary small" type="submit">Reserve seats</button>
+  </p>
+</form>

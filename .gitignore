@@ -60,3 +60,6 @@ Thumbs.db
 !/apps/movie-theater/public/models/NOTICE.md
 !/apps/movie-theater/public/models/YOLOX-LICENSE.txt
 !/apps/movie-theater/public/models/ONNX-RUNTIME-LICENSE.txt
+
+# Workshop lab: backups written by pnpm lab:solve / lab:reset
+*.mine

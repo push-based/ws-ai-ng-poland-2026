@@ -1,0 +1,59 @@
+<!--
+  Exercise 4.3 · Declarative WebMCP: an agent-ready form — SOLUTION
+  Copy into place with: pnpm lab:solve 4-3
+
+  `novalidate` is on purpose: our code validates (Step 4), so an agent gets a
+  readable reason instead of a silently blocked submission.
+-->
+<form
+  toolname="reserve_seats"
+  tooldescription="Reserve seats for one Nano Cinema screening: choose the film, the number of seats (1 to 6) and the showtime. Returns a reservation code."
+  toolautosubmit
+  novalidate
+  (submit)="submitted.emit($event)"
+>
+  <div class="lab-grid">
+    <div>
+      <label for="reserve-movie">Film</label>
+      <select
+        id="reserve-movie"
+        name="movieId"
+        required
+        toolparamdescription="The film to watch, by catalogue id: sintel (Sintel), bunny (Big Buck Bunny) or dream (Elephants Dream)."
+      >
+        <option value="sintel">Sintel</option>
+        <option value="bunny">Big Buck Bunny</option>
+        <option value="dream">Elephants Dream</option>
+      </select>
+    </div>
+    <div>
+      <label for="reserve-seats">Seats (1–6)</label>
+      <input
+        id="reserve-seats"
+        name="seats"
+        type="number"
+        min="1"
+        max="6"
+        value="2"
+        required
+        toolparamdescription="How many seats to reserve: a whole number from 1 to 6."
+      />
+    </div>
+    <div>
+      <label for="reserve-showtime">Showtime</label>
+      <select
+        id="reserve-showtime"
+        name="showtime"
+        required
+        toolparamdescription="The screening start time, 24-hour clock: 18:00, 20:30 or 22:45."
+      >
+        <option value="18:00">18:00</option>
+        <option value="20:30">20:30</option>
+        <option value="22:45">22:45</option>
+      </select>
+    </div>
+  </div>
+  <p class="lab-row">
+    <button class="button primary small" type="submit">Reserve seats</button>
+  </p>
+</form>

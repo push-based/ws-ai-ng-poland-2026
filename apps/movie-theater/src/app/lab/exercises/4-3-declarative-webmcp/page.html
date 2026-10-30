@@ -1,0 +1,137 @@
+<app-lab-frame exerciseId="4-3" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · An ordinary form, made agent-ready</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="
+          mode() === 'native'
+            ? 'available'
+            : mode() === 'simulated'
+              ? 'basic'
+              : 'missing'
+        "
+        >{{
+          mode() === 'native'
+            ? 'Native WebMCP'
+            : mode() === 'simulated'
+              ? 'Simulated WebMCP'
+              : 'No WebMCP'
+        }}</span
+      >
+    </div>
+    <p>
+      This form comes from <code>exercise.html</code>. Steps 1–3 add HTML
+      attributes, and the browser turns the form into a tool. You write no
+      JavaScript for that. Steps 4–5 (<code>exercise.ts</code>) handle the
+      submit, for people and agents alike.
+    </p>
+    <app-lab-reservation-form (submitted)="onSubmit($event)" />
+    @if (lastSubmit(); as last) {
+      <p class="micro">Last submit, by {{ last.by }}:</p>
+      <pre class="lab-output code">{{ last.text }}</pre>
+    }
+    @if (reservations().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Film</th>
+            <th>Seats</th>
+            <th>Showtime</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of reservations(); track item.code) {
+            <tr>
+              <td>
+                <code>{{ item.code }}</code>
+              </td>
+              <td>{{ titleOf(item.movieId) }}</td>
+              <td>{{ item.seats }}</td>
+              <td>{{ item.showtime }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · What the browser sees</h2>
+    <p>
+      Steps 1–2: <code>getTools()</code> lists the form as a tool. The browser
+      builds the input schema from your HTML: every
+      <code>&lt;option&gt;</code> becomes an allowed value, and
+      <code>toolparamdescription</code> (or the label) becomes the description.
+    </p>
+    <button
+      class="button secondary small"
+      (click)="discover()"
+      [disabled]="log.busy()"
+    >
+      Discover tools
+    </button>
+    @if (tool(); as tool) {
+      <p>
+        <code>{{ tool.name }}</code> · {{ tool.description }}
+      </p>
+      <pre class="lab-output code">{{ schemaText(tool.inputSchema) }}</pre>
+    } @else if (toolCount() !== undefined) {
+      <p class="micro">
+        The browser lists {{ toolCount() }} tool(s), but none called
+        reserve_seats yet.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Let an agent fill the form</h2>
+    <p>
+      Steps 3–5: <code>executeTool()</code> does what an agent would. It fills
+      the fields, submits (with <code>toolautosubmit</code>) and waits for your
+      <code>respondWith()</code>. The second call asks for 9 seats; your Step 4
+      validation should refuse it. In the simulation it always reaches your
+      handler. Chrome may already refuse it because of <code>max="6"</code>.
+    </p>
+    <div class="lab-row">
+      @for (call of calls; track call.label) {
+        <button
+          class="button secondary small"
+          (click)="agentFill(call)"
+          [disabled]="waiting()"
+        >
+          {{ call.label }} <span class="micro">{{ call.argsText }}</span>
+        </button>
+      }
+    </div>
+    @if (waiting()) {
+      <p class="micro">
+        Waiting for a person to press <strong>Reserve seats</strong>…
+      </p>
+    }
+    @if (agentResult(); as result) {
+      <p class="micro">
+        <span
+          class="lab-badge"
+          [attr.data-state]="result.failed ? 'error' : 'ok'"
+          >{{ result.failed ? 'Error' : 'Agent received' }}</span
+        >
+        {{ result.call }}
+      </p>
+      <pre class="lab-output code">{{ result.text }}</pre>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>D · Try it from DevTools</h2>
+    <p>
+      Open DevTools (F12) → Console on this page and paste this. It works with
+      native WebMCP and with the simulation.
+    </p>
+    <pre class="lab-output code">{{ devtoolsSnippet }}</pre>
+    <button class="button secondary small" (click)="copySnippet()">
+      Copy snippet
+    </button>
+  </section>
+</app-lab-frame>

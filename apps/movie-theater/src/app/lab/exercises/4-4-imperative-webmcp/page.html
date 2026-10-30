@@ -1,0 +1,164 @@
+<app-lab-frame exerciseId="4-4" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Register the watchlist tools</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="
+          mode() === 'native'
+            ? 'available'
+            : mode() === 'simulated'
+              ? 'basic'
+              : 'missing'
+        "
+        >{{
+          mode() === 'native'
+            ? 'Native WebMCP'
+            : mode() === 'simulated'
+              ? 'Simulated WebMCP'
+              : 'No WebMCP'
+        }}</span
+      >
+    </div>
+    <p>
+      Steps 1, 3 and 4: find <code>document.modelContext</code>, build three
+      tools and register them with one <code>AbortSignal</code>. Unregister
+      aborts that signal; leaving the page does the same.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="register()"
+        [disabled]="log.busy() || registered()"
+      >
+        Register tools
+      </button>
+      <button
+        class="button secondary small"
+        (click)="unregister()"
+        [disabled]="!registered()"
+      >
+        Unregister (abort)
+      </button>
+      <span
+        class="lab-badge"
+        [attr.data-state]="registered() ? 'ok' : 'missing'"
+        >{{ registered() ? 'Registered' : 'Not registered' }}</span
+      >
+    </div>
+    @if (mode() === 'native') {
+      <p class="micro">
+        Native mode: the cinema app has already registered its own six tools
+        (search_movies, set_audio_mix, …). Ours use different names, so they do
+        not clash.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · The watchlist</h2>
+    <p>
+      People use these buttons; agents use the tools. Both call the same
+      <code>Watchlist</code> methods, so the list below always shows the truth.
+    </p>
+    <div class="lab-row">
+      @for (movie of movies; track movie.id) {
+        <button class="button secondary small" (click)="toggle(movie.id)">
+          {{ isListed(movie.id) ? '−' : '+' }} {{ movie.title }}
+        </button>
+      }
+    </div>
+    @if (entries().length) {
+      <ol>
+        @for (entry of entries(); track entry.id) {
+          <li>
+            {{ entry.title }} <code>{{ entry.id }}</code>
+          </li>
+        }
+      </ol>
+    } @else {
+      <p class="micro">The watchlist is empty.</p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · What the browser sees</h2>
+    <p>
+      <code>getTools()</code> lists every tool registered on this page, with the
+      schema an agent reads. Step 3 decides what appears here.
+    </p>
+    <button
+      class="button secondary small"
+      (click)="discover()"
+      [disabled]="log.busy()"
+    >
+      Discover via browser
+    </button>
+    @if (discovered().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>inputSchema</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tool of discovered(); track tool.name) {
+            <tr>
+              <td>
+                <code>{{ tool.name }}</code>
+              </td>
+              <td>{{ tool.description }}</td>
+              <td>
+                <pre class="lab-output code">{{
+                  schemaText(tool.inputSchema)
+                }}</pre>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>D · Execute via the browser, like an agent</h2>
+    <p>
+      Step 2 and 3: each button calls <code>executeTool()</code>, so the browser
+      runs your <code>execute()</code>. The last two send arguments that the
+      schema forbids. Only your own validation stops them.
+    </p>
+    <div class="lab-row">
+      @for (call of examples; track $index) {
+        <button class="button secondary small" (click)="execute(call)">
+          {{ call.name }} {{ call.argsText }}
+          <span class="micro">· {{ call.note }}</span>
+        </button>
+      }
+    </div>
+    @if (result(); as result) {
+      <p class="micro">
+        <span
+          class="lab-badge"
+          [attr.data-state]="result.failed ? 'error' : 'ok'"
+          >{{ result.failed ? 'Rejected' : 'Result' }}</span
+        >
+        {{ result.call }}
+      </p>
+      <pre class="lab-output code">{{ result.text }}</pre>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>E · Try it from DevTools</h2>
+    <p>
+      Open DevTools (F12) → Console on this page, register the tools, then paste
+      this. It works with native WebMCP and with the simulation.
+    </p>
+    <pre class="lab-output code">{{ devtoolsSnippet }}</pre>
+    <button class="button secondary small" (click)="copySnippet()">
+      Copy snippet
+    </button>
+  </section>
+</app-lab-frame>

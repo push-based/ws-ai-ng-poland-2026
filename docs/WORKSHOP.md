@@ -88,8 +88,12 @@ An inspector agent can be cloud-powered even though page tools are local.
 - Cloud inspector chat unavailable: inspect schema and invoke tools manually.
 - Wrong model output: compare source data and validate IDs; valid JSON does not prove the recommendation is correct.
 
-## Later participant edition
+## Participant exercises
 
-Once the complete app is approved, remove small, bounded API implementations for the six handbook exercises.
-Retain the working player, catalogue, media, design and fixture mode so participants concentrate on API concepts.
-Do not create unfinished exercises in this reference version.
+The participant edition is the **workshop lab** (`/lab`), not a stripped copy of the reference app.
+Each agenda sub-block has an exercise with a ready-made page and one participant file. Each file contains small `todo()` steps.
+The player, catalogue, media, design and fixture mode stay intact, so participants concentrate on API concepts.
+See [workshop/README.md](../workshop/README.md) for the participant flow and [workshop/EXERCISES.md](../workshop/EXERCISES.md) for the per-block mapping.
+
+Before class: run `pnpm lab:solve <id>` for every exercise and `pnpm lab:check all` (all pass), restore the starters with `git checkout -- apps/movie-theater/src/app/lab apps/cinema-mcp/src tools/lab` (this discards uncommitted changes in those folders), and try at least 2.1, 3.1 and 4.4 natively in the workshop Chrome profile.
+Participants without built-in AI use the lab's labelled **simulated browser AI** switch; it is the lab's counterpart of the cinema's Fixtures mode.

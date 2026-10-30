@@ -6,6 +6,12 @@
       "options": {
         "parser": "angular"
       }
+    },
+    {
+      "files": "workshop/**/*.md",
+      "options": {
+        "embeddedLanguageFormatting": "off"
+      }
     }
   ]
 }

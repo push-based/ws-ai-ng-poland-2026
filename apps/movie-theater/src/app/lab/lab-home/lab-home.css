@@ -1,0 +1,50 @@
+@import '../shared/lab-frame/lab-frame.css';
+
+.lab-block {
+  margin-top: 36px;
+}
+.lab-block h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lab-block-number {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: #211a12;
+  font-size: 14px;
+  font-weight: 700;
+}
+.lab-exercises {
+  display: grid;
+  gap: 10px;
+}
+.lab-exercise {
+  display: flex;
+  gap: 18px;
+  padding: 16px 20px;
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+.lab-exercise:hover {
+  border-color: #edbe7066;
+}
+.lab-exercise-id {
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--amber);
+  min-width: 44px;
+}
+.lab-exercise-body {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+.lab-exercise-body > span:not(.lab-tags) {
+  color: var(--muted);
+}

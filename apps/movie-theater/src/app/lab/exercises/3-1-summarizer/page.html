@@ -1,0 +1,151 @@
+<app-lab-frame exerciseId="3-1" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · The source text</h2>
+    <p>
+      We summarize the programme notes of one movie. The notes are given; your
+      code only decides how the summary should look.
+    </p>
+    <div class="lab-row">
+      <label
+        >Movie
+        <select (change)="setMovie($event)">
+          @for (movie of movies; track movie.id) {
+            <option [value]="movie.id" [selected]="movie.id === movieId()">
+              {{ movie.title }}
+            </option>
+          }
+        </select>
+      </label>
+      <span class="micro">{{ source().length }} characters</span>
+    </div>
+    <details>
+      <summary>Show the programme notes</summary>
+      <div class="lab-output">{{ source() }}</div>
+    </details>
+  </section>
+
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>B · Describe the summary</h2>
+      @if (support()) {
+        <span class="lab-badge" [attr.data-state]="support()">{{
+          support()
+        }}</span>
+      }
+    </div>
+    <p>
+      Step 1 turns these choices into an options object. Step 2 asks the browser
+      whether it can summarize with exactly those options. Change the options
+      and check again: availability belongs to one configuration.
+    </p>
+    <div class="lab-grid">
+      <label
+        >Type
+        <select (change)="setType($event)">
+          @for (value of types; track value) {
+            <option [value]="value" [selected]="value === type()">
+              {{ value }}
+            </option>
+          }
+        </select>
+      </label>
+      <label
+        >Length
+        <select (change)="setLength($event)">
+          @for (value of lengths; track value) {
+            <option [value]="value" [selected]="value === length()">
+              {{ value }}
+            </option>
+          }
+        </select>
+      </label>
+      <label
+        >Format
+        <select (change)="setFormat($event)">
+          @for (value of formats; track value) {
+            <option [value]="value" [selected]="value === format()">
+              {{ value }}
+            </option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Shared context (set once, used for every summary of this summarizer)
+        <input
+          [value]="sharedContext()"
+          (input)="setSharedContext($event)"
+          placeholder="Leave empty for no shared context"
+      /></label>
+    </div>
+    <div class="lab-row">
+      <button class="button secondary small" (click)="showOptions()">
+        Preview summaryOptions()
+      </button>
+      <button
+        class="button secondary small"
+        (click)="checkAvailability()"
+        [disabled]="log.busy()"
+      >
+        Check availability
+      </button>
+    </div>
+    @if (preview()) {
+      <pre class="lab-output code">{{ preview() }}</pre>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Summarize</h2>
+    <p>
+      Steps 3–4: create a summarizer with these options, summarize the notes,
+      then destroy it. The first native run may download the model; the bar
+      shows that progress.
+    </p>
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Context for this request only (optional, sent with summarize())
+        <input
+          [value]="context()"
+          (input)="setContext($event)"
+          placeholder="e.g. The reader is choosing a film for a family evening."
+      /></label>
+    </div>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="run()"
+        [disabled]="log.busy()"
+      >
+        Summarize
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!log.busy()"
+      >
+        Cancel
+      </button>
+      @if (timing()) {
+        <span class="micro">{{ timing() }}</span>
+      }
+    </div>
+    @if (progress() > 0 && progress() < 1) {
+      <div class="lab-meter" aria-label="Model download">
+        <span [style.width.%]="progress() * 100"></span>
+      </div>
+    }
+    @if (result()) {
+      <div class="lab-output">{{ result() }}</div>
+      @if (format() === 'markdown') {
+        <p class="micro">
+          Markdown is shown as plain text on purpose (you will see the
+          <code>-</code> or <code>*</code> characters). Model output is
+          untrusted: render it with a sanitizing Markdown library, never with
+          innerHTML.
+        </p>
+      }
+    }
+  </section>
+</app-lab-frame>
