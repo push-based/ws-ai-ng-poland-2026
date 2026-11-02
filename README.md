@@ -227,8 +227,27 @@ A published build containing those assets still needs attribution; download-on-s
 Subtitles contain sourced spoken dialogue, shifted to the excerpt timestamps. Big Buck Bunny has no dialogue subtitles. See [subtitle provenance](docs/SUBTITLES.md) for the separate timed-text licences.
 The supplied notes describe the original films; the excerpts are short demonstrations rather than complete screenings.
 
-The complete implementation remains intact.
-No participant TODOs or exercise framework have been introduced.
+The complete implementation remains intact: participant exercises live in a separate workshop lab (see below) and never replace reference code.
+
+## Workshop exercises
+
+Participants work in the **workshop lab** at **http://127.0.0.1:4200/lab**. It has one exercise per agenda sub-block (19 in total, 3 of them bonus). Each exercise has a ready-made page and one participant file with `todo()` steps.
+Start with [workshop/README.md](workshop/README.md). The overview is in [workshop/EXERCISES.md](workshop/EXERCISES.md), each exercise's guide in `workshop/exercises/<id>-<slug>.md`, and the finished code in `workshop/solutions/<id>/`.
+
+```sh
+pnpm lab:start          # serve the app without downloading media (or: pnpm start)
+pnpm lab:check 2-1      # check one exercise against simulated built-in AI
+pnpm lab:solve 2-1      # copy the reference solution in (keeps your file as .mine)
+```
+
+| Area       | Location                                                | Responsibility                                                                                             |
+| ---------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Lab pages  | `apps/movie-theater/src/app/lab`                        | Exercise catalogue, ready-made pages, participant `exercise.ts` starters                                   |
+| Simulation | `apps/movie-theater/src/app/lab/shared/simulated-ai.ts` | Labelled stand-ins for built-in AI and `document.modelContext`, for devices without support and for checks |
+| Materials  | `workshop/`                                             | Exercise descriptions, solutions, step-by-step guides and `node:test` checks                               |
+| Lab CLI    | `tools/lab`                                             | `lab:check/solve/reset/list` and the exercise 4.2 MCP client starter                                       |
+
+`pnpm test` covers the reference app only. Lab checks run through `pnpm lab:check`, because the starters fail them by design.
 
 ## Read the architecture
 

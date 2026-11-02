@@ -22,5 +22,11 @@ export const appRoutes: Routes = [
         (module) => module.Preflight,
       ),
   },
+  {
+    // Workshop exercises. The reference cinema above stays complete; the lab is
+    // where participants write their own code against the same browser APIs.
+    path: 'lab',
+    loadChildren: () => import('./lab/lab.routes').then((m) => m.labRoutes),
+  },
   { path: '**', redirectTo: '' },
 ];

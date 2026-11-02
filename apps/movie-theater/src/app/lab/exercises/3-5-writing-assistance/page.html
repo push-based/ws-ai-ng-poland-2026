@@ -1,0 +1,128 @@
+<app-lab-frame exerciseId="3-5" [log]="log">
+  <section class="panel lab-card">
+    <p>
+      <strong>Bonus exercise.</strong> Writer, Rewriter and Proofreader are
+      developer-trial / experimental APIs. Your Chrome may not expose them; if
+      the check below says <em>missing</em>, turn on the simulation above.
+    </p>
+    <div class="lab-row">
+      <button class="button secondary small" (click)="checkApis()">
+        Check which APIs exist
+      </button>
+      @for (api of apis(); track api.name) {
+        <span
+          class="lab-badge"
+          [attr.data-state]="api.exposed ? 'available' : 'missing'"
+          >{{ api.name }}: {{ api.exposed ? 'exposed' : 'missing' }}</span
+        >
+      }
+    </div>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>A · Your draft</h2>
+    <p>
+      Only you change this text. The buttons below create a
+      <strong>suggestion</strong>; nothing replaces your draft until you accept
+      it, and nothing is saved until you press Save.
+    </p>
+    <label
+      >Comment draft
+      <textarea [value]="draft()" (input)="setDraft($event)"></textarea>
+    </label>
+    <div class="lab-row">
+      <button
+        class="button secondary small"
+        (click)="draft.set(exampleNotesText)"
+      >
+        Use the example notes
+      </button>
+      <button
+        class="button primary small"
+        (click)="save()"
+        [disabled]="running() || !draft().trim()"
+      >
+        Save comment
+      </button>
+    </div>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Ask for help</h2>
+    <p>
+      Step 1 writes a comment from rough notes, Step 2 changes the tone of
+      existing text, Step 3 fixes spelling and grammar. Three APIs, one routine:
+      feature detection, availability, create, use, destroy.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button secondary small"
+        (click)="write()"
+        [disabled]="running()"
+      >
+        Draft from notes (Writer)
+      </button>
+      <label
+        >Tone
+        <select (change)="setTone($event)">
+          @for (value of tones; track value) {
+            <option [value]="value" [selected]="value === tone()">
+              {{ value }}
+            </option>
+          }
+        </select>
+      </label>
+      <button
+        class="button secondary small"
+        (click)="rewrite()"
+        [disabled]="running()"
+      >
+        Rewrite (Rewriter)
+      </button>
+      <button
+        class="button secondary small"
+        (click)="proofread()"
+        [disabled]="running()"
+      >
+        Proofread (Proofreader)
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+    </div>
+
+    @if (suggestion(); as suggestion) {
+      <div class="section-heading">
+        <h3>Suggestion from {{ suggestion.source }}</h3>
+        <span class="lab-badge" data-state="ai">AI suggestion</span>
+      </div>
+      <div class="lab-output">{{ suggestion.text }}</div>
+      <p class="micro">{{ suggestion.note }}</p>
+      <div class="lab-row">
+        <button class="button primary small" (click)="accept()">
+          Accept into draft
+        </button>
+        <button class="button secondary small" (click)="discard()">
+          Discard
+        </button>
+      </div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Saved comments</h2>
+    <p class="micro">
+      Kept in memory on this page only. Compare with the cinema's Comments
+      panel, which saves to localStorage after the same explicit action.
+    </p>
+    @for (comment of saved(); track $index) {
+      <div class="lab-output">{{ comment }}</div>
+    } @empty {
+      <p class="micro">No saved comments yet.</p>
+    }
+  </section>
+</app-lab-frame>

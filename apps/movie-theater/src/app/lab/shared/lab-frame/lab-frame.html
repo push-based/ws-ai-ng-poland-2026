@@ -1,0 +1,115 @@
+<div class="lab">
+  <nav class="lab-crumbs" aria-label="Breadcrumb">
+    <a routerLink="/lab">Workshop lab</a>
+    <span aria-hidden="true">/</span> Block {{ exercise().block }} ·
+    {{ blocks[exercise().block] }}
+  </nav>
+  <header class="lab-header">
+    <span class="eyebrow"
+      >EXERCISE {{ exercise().id.replace('-', '.') }} ·
+      {{ exercise().topic.toUpperCase() }}</span
+    >
+    <h1>{{ exercise().title }}</h1>
+    <p class="lab-summary">{{ exercise().summary }}</p>
+    <div class="lab-tags">
+      <span class="api-chip">{{ exercise().api }}</span>
+      <span class="lab-tag">~{{ exercise().minutes }} min</span>
+      @if (exercise().optional) {
+        <span class="lab-tag optional">Bonus</span>
+      }
+    </div>
+  </header>
+
+  <section class="lab-howto panel" aria-label="How to work on this exercise">
+    <div>
+      <strong>1 · Edit</strong>
+      @for (file of exercise().files; track file) {
+        <code class="lab-path">{{ file }}</code>
+      }
+    </div>
+    <div>
+      <strong>2 · Follow</strong>
+      <code class="lab-path">{{ exercise().guide }}</code>
+    </div>
+    <div>
+      <strong>3 · Check</strong>
+      <code class="lab-path">pnpm lab:check {{ exercise().id }}</code>
+    </div>
+  </section>
+
+  <section
+    class="lab-mode panel"
+    [class.simulated]="simulation.enabled()"
+    aria-label="Built-in AI mode"
+  >
+    <label class="lab-switch">
+      <input
+        type="checkbox"
+        [checked]="simulation.enabled()"
+        (change)="toggleSimulation($event)"
+      />
+      Use simulated browser AI
+    </label>
+    @if (simulation.enabled()) {
+      <span class="lab-mode-text"
+        ><strong>SIMULATED.</strong> No model runs. Answers are deterministic
+        text so you can test your code's logic. Turn this off to use the real
+        on-device model.</span
+      >
+    } @else if (simulation.nativePrompt()) {
+      <span class="lab-mode-text"
+        ><strong>NATIVE.</strong> Your code calls Chrome's built-in AI on this
+        device.</span
+      >
+    } @else {
+      <span class="lab-mode-text"
+        ><strong>NO BUILT-IN AI DETECTED.</strong> Check /preflight, or switch
+        on the simulation to continue.</span
+      >
+    }
+  </section>
+
+  <div class="lab-body">
+    <ng-content />
+  </div>
+
+  @if (log(); as log) {
+    <section class="lab-log panel" aria-label="Event log">
+      <div class="lab-log-heading">
+        <h2>Event log</h2>
+        <button class="button secondary small" (click)="log.clear()">
+          Clear
+        </button>
+      </div>
+      @if (!log.entries().length) {
+        <p class="micro">
+          Nothing yet. Click a button above. Unfinished steps show up here as
+          hints.
+        </p>
+      }
+      <ol aria-live="polite">
+        @for (entry of log.entries(); track $index) {
+          <li [attr.data-kind]="entry.kind">
+            <time>{{ entry.time }}</time>
+            <span>{{ entry.text }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+  }
+
+  <nav class="lab-pager" aria-label="Exercise navigation">
+    @if (previous(); as previous) {
+      <a class="button secondary small" [routerLink]="['/lab', previous.id]"
+        >← {{ previous.id.replace('-', '.') }} {{ previous.title }}</a
+      >
+    } @else {
+      <span></span>
+    }
+    @if (next(); as next) {
+      <a class="button secondary small" [routerLink]="['/lab', next.id]"
+        >{{ next.id.replace('-', '.') }} {{ next.title }} →</a
+      >
+    }
+  </nav>
+</div>

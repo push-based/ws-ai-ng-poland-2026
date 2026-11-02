@@ -1,0 +1,159 @@
+<app-lab-frame exerciseId="3-4" [log]="log">
+  <section class="panel lab-card">
+    <p>
+      <strong>Bonus exercise.</strong> Language Detector and Translator are
+      separate task APIs. Each language pair has its own availability and may
+      need its own download.
+    </p>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>A · Which language is this?</h2>
+    <p>
+      Step 1: the cinema's concierge speaks English. Detecting the language of a
+      request first lets an app translate it before prompting. Short texts give
+      less reliable guesses: watch the confidence.
+    </p>
+    <label
+      >Viewer request
+      <textarea [value]="request()" (input)="setRequest($event)"></textarea>
+    </label>
+    <div class="lab-row">
+      @for (example of examples; track example) {
+        <button class="button secondary small" (click)="request.set(example)">
+          {{ example }}
+        </button>
+      }
+    </div>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="detect()"
+        [disabled]="running()"
+      >
+        Detect language
+      </button>
+      @if (detected(); as detected) {
+        <span class="lab-badge" data-state="ok"
+          >{{ languageName(detected.language) }} ({{ detected.language }})</span
+        >
+        <span class="micro"
+          >confidence {{ (detected.confidence * 100).toFixed(0) }}%</span
+        >
+      }
+    </div>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Which language pairs work here?</h2>
+    <p>
+      Step 2: availability is checked per pair. English → Polish being available
+      says nothing about English → French.
+    </p>
+    <button class="button secondary small" (click)="checkPairs()">
+      Check en → every target
+    </button>
+    @if (pairs().length) {
+      <div class="lab-row">
+        @for (pair of pairs(); track pair.code) {
+          <span class="lab-badge" [attr.data-state]="pair.state"
+            >en → {{ pair.code }} ({{ pair.label }}): {{ pair.state }}</span
+          >
+        }
+      </div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Translate real subtitles</h2>
+    <p>
+      Step 3: one translator for all cues. Only the text is sent to the model;
+      start and end times are copied unchanged, so the player still shows each
+      line at the right moment.
+    </p>
+    <div class="lab-row">
+      <label
+        >Movie
+        <select (change)="setMovie($event)">
+          @for (movie of movies; track movie.id) {
+            <option [value]="movie.id" [selected]="movie.id === movieId()">
+              {{ movie.title }} ({{ movie.captions.length }} cues)
+            </option>
+          }
+        </select>
+      </label>
+      <label
+        >Target language
+        <select (change)="setTarget($event)">
+          @for (language of targetLanguages; track language.code) {
+            <option
+              [value]="language.code"
+              [selected]="language.code === target()"
+            >
+              {{ language.label }}
+            </option>
+          }
+        </select>
+      </label>
+      <button
+        class="button primary small"
+        (click)="translate()"
+        [disabled]="running()"
+      >
+        Translate subtitles
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+      @if (progress()) {
+        <span class="micro">{{ progress() }}</span>
+      }
+    </div>
+
+    @if (!original().length) {
+      <p class="micro">
+        This excerpt has no spoken dialogue, so there are no cues to translate.
+        Translation cannot create subtitles for silence.
+      </p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Original (en)</th>
+            <th>Translated ({{ target() }})</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cue of original(); track $index) {
+            <tr>
+              <td>{{ time(cue.start) }}</td>
+              <td>{{ time(cue.end) }}</td>
+              <td>{{ cue.text }}</td>
+              <td>
+                @if (translated()[$index]; as result) {
+                  {{ result.text }}
+                  @if (result.start !== cue.start || result.end !== cue.end) {
+                    <span class="lab-badge" data-state="error"
+                      >times changed!</span
+                    >
+                  }
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    <p class="micro">
+      In simulated mode English → Polish uses the cinema's prepared fixture
+      lines; other languages are only tagged, for example
+      <code>[de] …</code>. No model translates anything.
+    </p>
+  </section>
+</app-lab-frame>

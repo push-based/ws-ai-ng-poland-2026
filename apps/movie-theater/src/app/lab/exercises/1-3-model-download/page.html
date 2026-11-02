@@ -1,0 +1,91 @@
+<app-lab-frame exerciseId="1-3" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Is the model ready?</h2>
+      @if (status(); as status) {
+        <span class="lab-badge" [attr.data-state]="status">{{ status }}</span>
+      }
+    </div>
+    <p>
+      Steps 1–2: <code>availability()</code> is cheap and never downloads
+      anything, so you can call it any time. Turn its answer into a sentence
+      people understand.
+    </p>
+    <button
+      class="button primary small"
+      (click)="check()"
+      [disabled]="log.busy()"
+    >
+      Check model status
+    </button>
+    @if (description()) {
+      <div class="lab-output">{{ description() }}</div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>B · Download and initialize</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="session() ? 'available' : 'missing'"
+        >{{ session() ? 'Session ready' : 'No session' }}</span
+      >
+    </div>
+    <p>
+      Steps 3–5: <code>LanguageModel.create()</code> downloads the model when it
+      is <em>downloadable</em>. Chrome needs a user action, such as this click,
+      before it starts a download, so never call create() on page load. Progress
+      events drive the bar; <strong>Cancel</strong> aborts the signal;
+      <strong>Release</strong> frees the device memory.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="prepare()"
+        [disabled]="preparing() || !!session()"
+      >
+        Prepare model
+      </button>
+      <button
+        class="button secondary small"
+        (click)="cancel()"
+        [disabled]="!preparing()"
+      >
+        Cancel
+      </button>
+      <button
+        class="button secondary small"
+        (click)="release()"
+        [disabled]="preparing() || !session()"
+      >
+        Release model
+      </button>
+    </div>
+    @if (progress() !== undefined) {
+      <div
+        class="lab-meter"
+        role="progressbar"
+        aria-label="Model download"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="percent(progress() ?? 0)"
+      >
+        <span [style.width.%]="percent(progress() ?? 0)"></span>
+      </div>
+      <p class="micro">{{ percent(progress() ?? 0) }} % downloaded</p>
+    } @else if (preparing()) {
+      <p class="micro">
+        Waiting for the first progress event… (a 🧩 hint in the log means Step 3
+        or 4 is not done yet)
+      </p>
+    }
+    <p class="micro">
+      Simulation: the first create() fakes a ~1.6 s download, after that the
+      model counts as <em>available</em> and jumps to 100 %. Switch the
+      simulation off and on again to start from <em>downloadable</em>. Native
+      Chrome: watch the real download on
+      <code>chrome://on-device-internals</code>.
+    </p>
+  </section>
+</app-lab-frame>

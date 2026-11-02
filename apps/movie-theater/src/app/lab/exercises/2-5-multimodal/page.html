@@ -1,0 +1,138 @@
+<app-lab-frame exerciseId="2-5" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · Can this device read images?</h2>
+    <p>
+      Steps 1–2: availability is checked per option set. A device that can
+      answer text questions may still be unable to read pictures, so image input
+      needs its own check.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button secondary small"
+        (click)="checkSupport()"
+        [disabled]="log.busy()"
+      >
+        Check image support
+      </button>
+      @if (textSupport(); as text) {
+        <span class="micro">Text only:</span>
+        <span class="lab-badge" [attr.data-state]="text">{{ text }}</span>
+      }
+      @if (imageSupport(); as image) {
+        <span class="micro">Text + image (checkImageSupport):</span>
+        <span class="lab-badge" [attr.data-state]="image">{{ image }}</span>
+      }
+    </div>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Choose a picture</h2>
+    <p>
+      Play a clip and capture a frame, or use any picture from your computer.
+      The preview on the right is exactly the image the model receives.
+    </p>
+    <div class="lab-grid">
+      <div>
+        <label
+          >Movie
+          <select (change)="selectMovie($event)">
+            @for (movie of movies; track movie.id) {
+              <option [value]="movie.id" [selected]="movie.id === movieId()">
+                {{ movie.title }}
+              </option>
+            }
+          </select>
+        </label>
+        <video
+          #video
+          [src]="'media/' + movieId() + '.mp4'"
+          [poster]="'media/' + movieId() + '.jpg'"
+          controls
+          playsinline
+          preload="metadata"
+          style="width: 100%; border-radius: 10px"
+          (error)="videoError.set(true)"
+          (loadeddata)="videoError.set(false)"
+        ></video>
+        @if (videoError()) {
+          <p class="micro">
+            <span class="lab-badge" data-state="missing">clip missing</span>
+            media/{{ movieId() }}.mp4 could not be loaded. The clips are not in
+            Git: run <code>pnpm media:download</code> in the repository folder,
+            restart <code>pnpm start</code> and reload. Or use your own picture
+            below.
+          </p>
+        }
+        <div class="lab-row">
+          <button
+            class="button primary small"
+            (click)="captureFrame()"
+            [disabled]="log.busy()"
+          >
+            Capture frame
+          </button>
+          <label
+            >…or your own picture
+            <input type="file" accept="image/*" (change)="useFile($event)" />
+          </label>
+        </div>
+      </div>
+      <div>
+        <canvas
+          #frame
+          [hidden]="!imageLabel()"
+          style="width: 100%; border-radius: 10px"
+        ></canvas>
+        @if (imageLabel()) {
+          <p class="micro">{{ imageLabel() }}</p>
+        } @else {
+          <div class="lab-output">No picture yet.</div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Ask about the picture</h2>
+    <p>
+      Steps 3–4: <code>describeImage()</code> sends your question and the
+      picture in one message to a short-lived session, then destroys it.
+    </p>
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Question
+        <input
+          [value]="question()"
+          (input)="setQuestion($event)"
+          (keydown.enter)="describe()"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="describe()"
+        [disabled]="log.busy() || !imageLabel()"
+      >
+        Describe
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!working()"
+      >
+        Stop
+      </button>
+    </div>
+    <div class="lab-output">
+      {{
+        answer() ||
+          (imageLabel()
+            ? 'The answer appears here.'
+            : 'Capture a frame or choose a picture first.')
+      }}
+    </div>
+    <p class="micro">
+      The model sees only these pixels: no title, no sound, no story. Compare
+      the answer with the picture. A character name or a plot detail it could
+      not see is a model error (a hallucination), even when it sounds confident.
+    </p>
+  </section>
+</app-lab-frame>

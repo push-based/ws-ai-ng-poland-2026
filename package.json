@@ -8,10 +8,16 @@
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",
     "mcp": "node apps/cinema-mcp/dist/main.js",
-    "format": "prettier --write apps libs tools docs README.md",
+    "format": "prettier --write apps libs tools docs workshop README.md",
     "media:download": "tsx tools/download-media.ts",
     "media:check": "tsx tools/download-media.ts --check",
-    "onnx:download": "tsx tools/download-onnx.ts"
+    "onnx:download": "tsx tools/download-onnx.ts",
+    "lab:start": "nx run catalogue:build && nx run movie-theater:serve --exclude-task-dependencies --host=127.0.0.1",
+    "lab:list": "tsx tools/lab/cli.ts list",
+    "lab:check": "tsx tools/lab/cli.ts check",
+    "lab:solve": "tsx tools/lab/cli.ts solve",
+    "lab:reset": "tsx tools/lab/cli.ts reset",
+    "lab:mcp-client": "tsx tools/lab/mcp-client.ts"
   },
   "private": true,
   "dependencies": {

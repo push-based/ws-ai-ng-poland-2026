@@ -1,0 +1,123 @@
+<app-lab-frame exerciseId="2-2" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Watch the answer arrive</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="
+          streaming() ? 'downloading' : hasSession() ? 'available' : 'missing'
+        "
+        >{{
+          streaming()
+            ? 'Streaming…'
+            : hasSession()
+              ? 'Session active'
+              : 'No session yet'
+        }}</span
+      >
+    </div>
+    <p>
+      Steps 1–3: <code>streamAnswer()</code> reads the answer chunk by chunk and
+      shows it while the model is still writing. Press <strong>Stop</strong> in
+      the middle: the text stops growing and the log says "cancelled" (Step 2).
+    </p>
+
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Your question
+        <input
+          [value]="question()"
+          (input)="setQuestion($event)"
+          (keydown.enter)="ask()"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="ask()"
+        [disabled]="log.busy()"
+      >
+        Ask (streaming)
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!streaming()"
+      >
+        Stop
+      </button>
+    </div>
+    <div class="lab-row">
+      @for (suggestion of suggestions; track suggestion) {
+        <button
+          class="button secondary small"
+          (click)="question.set(suggestion)"
+        >
+          {{ suggestion }}
+        </button>
+      }
+    </div>
+
+    <div class="lab-output">{{ answer() || 'The answer appears here.' }}</div>
+
+    @if (stats(); as stats) {
+      <table>
+        <tr>
+          <th>Chunks received</th>
+          <th>First text after</th>
+          <th>Complete after</th>
+        </tr>
+        <tr>
+          <td>{{ stats.chunks }}</td>
+          <td>
+            {{
+              stats.firstChunkMs !== undefined
+                ? stats.firstChunkMs + ' ms'
+                : '…'
+            }}
+          </td>
+          <td>
+            @if (stats.totalMs === undefined) {
+              …
+            } @else if (stats.stopped) {
+              stopped after {{ stats.totalMs }} ms
+            } @else {
+              {{ stats.totalMs }} ms
+            }
+          </td>
+        </tr>
+      </table>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · The same question without streaming</h2>
+    <p>
+      For comparison, this button calls <code>session.prompt()</code>. It shows
+      nothing until the whole answer is ready, so the time to the first text is
+      the total time. Compare it with "First text after" in section A.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button secondary small"
+        (click)="askWithoutStreaming()"
+        [disabled]="log.busy()"
+      >
+        Ask without streaming
+      </button>
+      <button
+        class="button secondary small"
+        (click)="newSession()"
+        [disabled]="log.busy() || !hasSession()"
+      >
+        New session
+      </button>
+    </div>
+    @if (oneShot(); as oneShot) {
+      <p class="micro">The whole answer arrived after {{ oneShot.ms }} ms.</p>
+      <div class="lab-output">{{ oneShot.text }}</div>
+    }
+    <p class="micro">
+      Both buttons use the same session, so every question also becomes part of
+      the conversation. "New session" starts again with only the system prompt.
+    </p>
+  </section>
+</app-lab-frame>

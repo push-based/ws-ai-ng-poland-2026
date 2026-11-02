@@ -1,0 +1,242 @@
+<app-lab-frame exerciseId="1-1" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Measure a local prompt</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="session() ? 'available' : 'missing'"
+        >{{ session() ? 'Session active' : 'No session' }}</span
+      >
+    </div>
+    <p>
+      Step 1: a model reads and writes <strong>tokens</strong> (small pieces of
+      words). Count the tokens of a question and its answer, and time how long
+      the answer takes. On the device, none of these tokens appear on a bill.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="start()"
+        [disabled]="log.busy() || !!session()"
+      >
+        Create session
+      </button>
+      <button
+        class="button secondary small"
+        (click)="end()"
+        [disabled]="!session()"
+      >
+        End session
+      </button>
+      @if (usage()) {
+        <span class="micro">{{ usage() }}</span>
+      }
+    </div>
+    <label
+      >Prompt
+      <textarea [value]="prompt()" (input)="setPrompt($event)"></textarea>
+    </label>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="measure()"
+        [disabled]="log.busy() || !session()"
+      >
+        Measure this prompt
+      </button>
+      @for (suggestion of suggestions; track suggestion) {
+        <button class="button secondary small" (click)="prompt.set(suggestion)">
+          {{
+            suggestion.length > 40 ? suggestion.slice(0, 40) + '…' : suggestion
+          }}
+        </button>
+      }
+    </div>
+    @if (rows().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th>Input tokens</th>
+            <th>Output tokens (approx.)</th>
+            <th>Latency</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track $index) {
+            <tr>
+              <td>{{ row.prompt }}</td>
+              <td>{{ row.inputTokens }}</td>
+              <td>{{ row.outputTokens }}</td>
+              <td>{{ row.latencyMs }} ms</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <h3>Latest answer</h3>
+      <div class="lab-output">{{ last()?.answer }}</div>
+      <p class="micro">
+        Output tokens are an approximation: the answer is measured as if it were
+        input. The session's context grows with every turn, because the whole
+        conversation stays in it.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · What would the same traffic cost in the cloud?</h2>
+    <p>
+      Step 2: cloud providers bill per token, usually priced per one million
+      tokens, with output tokens priced higher than input tokens. The estimate
+      uses the latest measurement from section A.
+    </p>
+    <p class="micro">
+      <strong>Example numbers only.</strong> Enter your provider's current price
+      list: prices differ per model and change often.
+    </p>
+    <div class="lab-row">
+      <label
+        >Input price, $ per 1M tokens
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [value]="inputPrice()"
+          (input)="setNumber('input', $event)"
+      /></label>
+      <label
+        >Output price, $ per 1M tokens
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [value]="outputPrice()"
+          (input)="setNumber('output', $event)"
+      /></label>
+      <label
+        >Requests per month
+        <input
+          type="number"
+          min="0"
+          step="1000"
+          [value]="requestsPerMonth()"
+          (input)="setNumber('requests', $event)"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="estimate()"
+        [disabled]="log.busy()"
+      >
+        Estimate cost
+      </button>
+    </div>
+    @if (cost(); as cost) {
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Per request</th>
+            <th>Per month</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cloud API (estimate)</td>
+            <td>{{ money(cost.perRequest) }}</td>
+            <td>{{ money(cost.perMonth) }}</td>
+          </tr>
+          <tr>
+            <td>On this device</td>
+            <td>{{ money(0) }}</td>
+            <td>{{ money(0) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="micro">
+        "Zero token cost" is not "zero cost": on-device inference still needs a
+        one-time model download, storage, battery and the user's CPU/GPU, and
+        not every device can run it.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · Local, cloud or hybrid?</h2>
+    <p>
+      Step 3: describe a feature and let your rules choose where its AI should
+      run. <em>Hybrid</em> means the device does part of the work (for example
+      redacting private data) and the cloud does the rest.
+    </p>
+    <div class="lab-row">
+      <label
+        >Local model availability
+        <select (change)="pickAvailability($event)">
+          @for (state of availabilityStates; track state) {
+            <option
+              [value]="state"
+              [selected]="state === needs().localAvailability"
+            >
+              {{ state }}
+            </option>
+          }
+        </select>
+      </label>
+      <button
+        class="button secondary small"
+        (click)="useThisDevice()"
+        [disabled]="log.busy()"
+      >
+        Use this browser's answer
+      </button>
+    </div>
+    <div class="lab-row">
+      <label class="inline"
+        ><input
+          type="checkbox"
+          [checked]="needs().dataIsSensitive"
+          (change)="toggleNeed('dataIsSensitive', $event)"
+        />
+        The data is private (notes, health, messages)</label
+      >
+      <label class="inline"
+        ><input
+          type="checkbox"
+          [checked]="needs().mustWorkOffline"
+          (change)="toggleNeed('mustWorkOffline', $event)"
+        />
+        It must work offline</label
+      >
+      <label class="inline"
+        ><input
+          type="checkbox"
+          [checked]="needs().needsLargeModel"
+          (change)="toggleNeed('needsLargeModel', $event)"
+        />
+        It needs a large model (long reasoning, broad knowledge)</label
+      >
+    </div>
+    <button
+      class="button primary small"
+      (click)="decide()"
+      [disabled]="log.busy()"
+    >
+      Decide
+    </button>
+    @if (decision(); as decision) {
+      <div class="lab-output">
+        <span
+          class="lab-badge"
+          [attr.data-state]="
+            decision.architecture === 'local'
+              ? 'ai'
+              : decision.architecture === 'hybrid'
+                ? 'basic'
+                : null
+          "
+          >{{ decision.architecture.toUpperCase() }}</span
+        >
+        {{ decision.reason }}
+      </div>
+    }
+  </section>
+</app-lab-frame>

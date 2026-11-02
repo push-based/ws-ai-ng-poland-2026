@@ -1,0 +1,83 @@
+<app-lab-frame exerciseId="2-1" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · What will the model see first?</h2>
+    <p>
+      Steps 1–2: the system prompt and a few-shot example are sent once, when
+      the session is created. Every later question builds on them.
+    </p>
+    <button class="button secondary small" (click)="showInitialPrompts()">
+      Preview initialPrompts()
+    </button>
+    @if (preview()) {
+      <pre class="lab-output code">{{ preview() }}</pre>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>B · Chat with the concierge</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="session() ? 'available' : 'missing'"
+        >{{ session() ? 'Session active' : 'No session' }}</span
+      >
+    </div>
+    <p>
+      Steps 3–5: start one session, ask several questions, then end it. Ask a
+      follow-up to see that the same session remembers earlier turns.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="start()"
+        [disabled]="log.busy() || !!session()"
+      >
+        Start session
+      </button>
+      <button
+        class="button secondary small"
+        (click)="end()"
+        [disabled]="log.busy() || !session()"
+      >
+        End session
+      </button>
+      @if (usage()) {
+        <span class="micro">{{ usage() }}</span>
+      }
+    </div>
+
+    @for (line of chat(); track $index) {
+      <div class="lab-output" [attr.data-role]="line.role">
+        <strong>{{ line.role === 'user' ? 'You' : 'Concierge' }}:</strong>
+        {{ line.text }}
+      </div>
+    }
+
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Your question
+        <input
+          [value]="question()"
+          (input)="setQuestion($event)"
+          (keydown.enter)="send()"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="send()"
+        [disabled]="log.busy() || !session()"
+      >
+        Ask
+      </button>
+    </div>
+    <div class="lab-row">
+      @for (suggestion of suggestions; track suggestion) {
+        <button
+          class="button secondary small"
+          (click)="question.set(suggestion)"
+        >
+          {{ suggestion }}
+        </button>
+      }
+    </div>
+  </section>
+</app-lab-frame>

@@ -70,6 +70,16 @@
   color: var(--text);
   border-bottom-color: var(--amber);
 }
+.lab-link {
+  margin-left: auto;
+  margin-right: 10px;
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
 .inspector-toggle {
   display: flex;
   align-items: center;

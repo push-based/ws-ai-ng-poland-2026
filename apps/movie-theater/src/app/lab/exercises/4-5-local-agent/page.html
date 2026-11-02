@@ -1,0 +1,144 @@
+<app-lab-frame exerciseId="4-5" [log]="log">
+  <section class="panel lab-card">
+    <div class="section-heading">
+      <h2>A · Prepare the agent</h2>
+      <span
+        class="lab-badge"
+        [attr.data-state]="
+          mode() === 'native'
+            ? 'available'
+            : mode() === 'simulated'
+              ? 'basic'
+              : 'missing'
+        "
+        >{{
+          mode() === 'native'
+            ? 'Native WebMCP'
+            : mode() === 'simulated'
+              ? 'Simulated WebMCP'
+              : 'No WebMCP'
+        }}</span
+      >
+    </div>
+    <p>
+      The agent has two halves: <strong>your watchlist tools</strong> from
+      exercise 4.4 (WebMCP, the hands) and a
+      <strong>base Prompt session</strong>
+      (the on-device model, the brain). Both stay on this device: no cloud
+      model, no API key, no token bill.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button primary small"
+        (click)="prepare()"
+        [disabled]="log.busy() || (toolsReady() && !!session())"
+      >
+        Prepare the agent
+      </button>
+      <span
+        class="lab-badge"
+        [attr.data-state]="toolsReady() ? 'ok' : 'missing'"
+        >{{ toolsReady() ? 'Tools registered' : 'No tools' }}</span
+      >
+      <span
+        class="lab-badge"
+        [attr.data-state]="session() ? 'ok' : 'missing'"
+        >{{ session() ? 'Session ready' : 'No session' }}</span
+      >
+      @if (baseUsage()) {
+        <span class="micro">{{ baseUsage() }}</span>
+      }
+    </div>
+    @if (needs44()) {
+      <p class="lab-output">
+        <span class="lab-badge" data-state="error">Needs 4.4</span> This page
+        uses YOUR tools from exercise 4.4, which still has a
+        <code>todo()</code>. Finish 4.4 first, or run
+        <code>pnpm lab:solve 4-4</code> in a terminal.
+      </p>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · Ask the agent</h2>
+    <p>
+      Steps 1–4: <code>runAgent()</code> discovers the tools, lets the model
+      choose one (or <code>none</code>), lets it fill in the arguments, and
+      executes that tool <strong>once</strong>. Your 4.4 handlers still validate
+      every argument.
+    </p>
+    @if (mode() === 'simulated') {
+      <p class="micro">
+        Simulated model: it only picks a tool whose name appears in your words
+        ("add to watchlist") and a film whose id or title appears. Free phrasing
+        like the last suggestion needs the real on-device model.
+      </p>
+    }
+    <div class="lab-row">
+      <label class="lab-grow"
+        >Your request
+        <input
+          [value]="request()"
+          (input)="setRequest($event)"
+          (keydown.enter)="ask()"
+      /></label>
+      <button
+        class="button primary small"
+        (click)="ask()"
+        [disabled]="running() || !session() || !toolsReady()"
+      >
+        Run agent
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+    </div>
+    <div class="lab-row">
+      @for (suggestion of suggestions; track suggestion) {
+        <button
+          class="button secondary small"
+          (click)="request.set(suggestion)"
+        >
+          {{ suggestion }}
+        </button>
+      }
+    </div>
+
+    @for (item of runs(); track $index) {
+      <div class="lab-output">
+        <strong>“{{ item.request }}”</strong>
+        <span class="micro">· {{ item.ms }} ms · 0 cloud tokens</span><br />
+        Tool:
+        <span
+          class="lab-badge"
+          [attr.data-state]="item.run.tool === 'none' ? 'missing' : 'ai'"
+          >{{ item.run.tool }}</span
+        >
+        @if (item.run.tool !== 'none') {
+          Arguments: <code>{{ argsText(item.run) }}</code>
+        }
+        <pre class="lab-output code">{{ item.resultText }}</pre>
+      </div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>C · The watchlist</h2>
+    <p>The real state after each run. Compare it with what the agent says.</p>
+    @if (entries().length) {
+      <ol>
+        @for (entry of entries(); track entry.id) {
+          <li>
+            {{ entry.title }} <code>{{ entry.id }}</code>
+          </li>
+        }
+      </ol>
+    } @else {
+      <p class="micro">The watchlist is empty.</p>
+    }
+  </section>
+</app-lab-frame>

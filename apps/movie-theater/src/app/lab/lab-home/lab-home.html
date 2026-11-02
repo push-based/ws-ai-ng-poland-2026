@@ -1,0 +1,65 @@
+<div class="lab">
+  <span class="eyebrow">AI AT ZERO TOKEN COST · HANDS-ON</span>
+  <h1>Workshop lab</h1>
+  <p class="lab-summary">
+    Each exercise has a ready-made page and one file for you to complete. Open
+    the file, work through its guide in <code>workshop/exercises/</code> step by
+    step, save, and the page reloads with your code. Run
+    <code>pnpm lab:check &lt;id&gt;</code> in a terminal to verify your work.
+  </p>
+
+  <section
+    class="lab-mode panel"
+    [class.simulated]="simulation.enabled()"
+    aria-label="Built-in AI mode"
+  >
+    <label class="lab-switch">
+      <input
+        type="checkbox"
+        [checked]="simulation.enabled()"
+        (change)="toggleSimulation($event)"
+      />
+      Use simulated browser AI
+    </label>
+    <span class="lab-mode-text">
+      @if (simulation.nativePrompt()) {
+        Chrome's built-in Prompt API is exposed in this browser. Keep the
+        simulation off to run real on-device models.
+      } @else {
+        This browser does not expose the Prompt API. Open
+        <a routerLink="/preflight">/preflight</a> to diagnose, or switch on the
+        simulation to practise the code.
+      }
+    </span>
+  </section>
+
+  @for (group of groups; track group.block) {
+    <section class="lab-block">
+      <h2>
+        <span class="lab-block-number">{{ group.block }}</span>
+        {{ group.title }}
+      </h2>
+      <div class="lab-exercises">
+        @for (exercise of group.exercises; track exercise.id) {
+          <a class="panel lab-exercise" [routerLink]="['/lab', exercise.id]">
+            <span class="lab-exercise-id">{{ label(exercise) }}</span>
+            <span class="lab-exercise-body">
+              <strong>{{ exercise.title }}</strong>
+              <span>{{ exercise.summary }}</span>
+              <span class="lab-tags">
+                <span class="api-chip">{{ exercise.api }}</span>
+                <span class="lab-tag">~{{ exercise.minutes }} min</span>
+                @if (exercise.optional) {
+                  <span class="lab-tag optional">Bonus</span>
+                }
+                @if (!exercise.load) {
+                  <span class="lab-tag">Terminal</span>
+                }
+              </span>
+            </span>
+          </a>
+        }
+      </div>
+    </section>
+  }
+</div>

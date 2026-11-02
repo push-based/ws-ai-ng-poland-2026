@@ -1,0 +1,124 @@
+<app-lab-frame exerciseId="3-2" [log]="log">
+  <section class="panel lab-card">
+    <h2>A · Read a stream (no AI yet)</h2>
+    <p>
+      Step 1: <code>readText()</code> reads any text stream. This demo stream
+      sends one word every 120 ms, so you can test your loop and the Stop button
+      before any model is involved.
+    </p>
+    <div class="lab-row">
+      <button
+        class="button secondary small"
+        (click)="readDemo()"
+        [disabled]="running()"
+      >
+        Read the demo stream
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+    </div>
+    @if (demoText()) {
+      <div class="lab-output">{{ demoText() }}</div>
+    }
+  </section>
+
+  <section class="panel lab-card">
+    <h2>B · One-shot versus streaming</h2>
+    <p>
+      Steps 2–3: the same notes and options, summarized twice. The one-shot call
+      (given) shows nothing until the end. Your streaming version shows text
+      while the model is still writing. Compare the time to the
+      <strong>first</strong> text: that is the wait the viewer feels.
+    </p>
+    <div class="lab-row">
+      <label
+        >Movie
+        <select (change)="setMovie($event)">
+          @for (movie of movies; track movie.id) {
+            <option [value]="movie.id" [selected]="movie.id === movieId()">
+              {{ movie.title }}
+            </option>
+          }
+        </select>
+      </label>
+      <label
+        >Length
+        <select (change)="setLength($event)">
+          @for (value of lengths; track value) {
+            <option [value]="value" [selected]="value === length()">
+              {{ value }}
+            </option>
+          }
+        </select>
+      </label>
+      <button
+        class="button primary small"
+        (click)="compare()"
+        [disabled]="running()"
+      >
+        Run both
+      </button>
+      <button
+        class="button secondary small"
+        (click)="runOnce()"
+        [disabled]="running()"
+      >
+        One-shot only
+      </button>
+      <button
+        class="button secondary small"
+        (click)="runStreaming()"
+        [disabled]="running()"
+      >
+        Streaming only
+      </button>
+      <button
+        class="button secondary small"
+        (click)="stop()"
+        [disabled]="!running()"
+      >
+        Stop
+      </button>
+    </div>
+    <details>
+      <summary>
+        Show the source notes ({{ source().length }} characters)
+      </summary>
+      <div class="lab-output">{{ source() }}</div>
+    </details>
+
+    <div class="lab-grid">
+      <div>
+        <h3>One-shot · summarize()</h3>
+        @if (onceTiming(); as timing) {
+          <p class="micro">
+            First text after {{ ms(timing.firstTextMs) }} · done after
+            {{ ms(timing.totalMs) }}
+          </p>
+        }
+        <div class="lab-output">{{ onceText() }}</div>
+      </div>
+      <div>
+        <h3>Streaming · summarizeStreaming()</h3>
+        @if (streamTiming(); as timing) {
+          <p class="micro">
+            First text after {{ ms(timing.firstTextMs) }} · done after
+            {{ ms(timing.totalMs) }}
+          </p>
+        }
+        <div class="lab-output">{{ streamText() }}</div>
+      </div>
+    </div>
+    <p class="micro">
+      The first run of each may include creating the summarizer (and a model
+      download), so run the comparison twice. In simulated mode the delays are
+      invented (a fixed wait for one-shot, 35 ms per word for streaming) and say
+      nothing about real performance.
+    </p>
+  </section>
+</app-lab-frame>
