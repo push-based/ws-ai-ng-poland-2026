@@ -59,7 +59,7 @@ test('Step 1 · get_movie is listed with a strict movieId enum and readOnlyHint'
   const tool = await getMovieTool();
   assert.ok(
     tool.description && tool.description.length > 20,
-    'give get_movie a description the host model can read',
+    'give get_movie a description the host model can read: one full sentence (more than 20 characters)',
   );
   const movieId = (
     tool.inputSchema.properties as

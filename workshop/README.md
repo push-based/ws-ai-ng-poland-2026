@@ -44,12 +44,11 @@ Each exercise follows the same five-step loop:
 
 1. **Open the page.** Go to `http://127.0.0.1:4200/lab/<id>` (for example `/lab/2-1`). The page is ready-made: buttons, inputs and an **Event log**.
 2. **Open your file.** The page shows its path under **1 · Edit**. In VS Code press `Cmd+P` (macOS) or `Ctrl+P` (Windows/Linux) and type the file name.
-3. **Follow the exercise guide.** Open `workshop/exercises/<id>-….md` (the page shows its path under **2 · Follow**). Each step says why it matters and which `todo(...)` line to replace, and ends on something you can see or check. Try the step yourself first: the skeleton and the solution sit behind collapsible **reveals** you open when you need them.
+3. **Follow the exercise guide.** Open `workshop/exercises/<id>-….md` (the page shows its path under **2 · Follow**). Each step is a short task list for one function. Try it yourself first: the skeleton and the solution sit behind collapsible **reveals** you open when you need them.
 4. **Save and try.** The app reloads by itself. Click the buttons for that step. Unfinished steps show a 🧩 hint in the Event log instead of an error.
 5. **Check.** In a second terminal run `pnpm lab:check <id>`. Every ✔ is a working step; a ✖ explains what to change.
 
-> [!TIP]
-> Open the **skeleton** reveal first when a step feels large. It shows the shape of the function and leaves the logic to you. The **solution** reveal is the finished function from `workshop/solutions/<id>/`.
+> **Tip:** Open the **skeleton** reveal first when a step feels large. It shows the shape of the function and leaves the logic to you. The **solution** reveal is the finished function from `workshop/solutions/<id>/`.
 
 ### Helper commands
 
@@ -109,5 +108,6 @@ The simulation never pretends to be the real thing. The page shows a **SIMULATED
 | 🧩 `Not implemented yet …` in the Event log  | Expected: that step still contains `todo(...)`. Replace the whole line as the exercise guide shows.      |
 | `… is not exposed by this browser`           | Use desktop Chrome, check `/preflight`, or switch on **Use simulated browser AI**.                       |
 | A model "downloads" for a long time          | First downloads are large. Watch `chrome://on-device-internals`. Use the simulation meanwhile.           |
+| `NotAllowedError` when creating or preparing | A model download needs a user action. Start it from a button click, as the lab pages do.                 |
 | `pnpm lab:check` says `The build failed`     | A TypeScript error in your file. The message above it shows the file and line.                           |
 | WebMCP: `document.modelContext` is undefined | Enable `chrome://flags/#enable-webmcp-testing` and relaunch Chrome, or switch on the simulation.         |

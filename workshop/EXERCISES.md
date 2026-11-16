@@ -4,7 +4,7 @@ All exercises of the **AI at Zero Token Cost** workshop, in agenda order. Each o
 
 - a ready-made page at `http://127.0.0.1:4200/lab/<id>`,
 - **one participant file** (two for 4.1 and 4.3) with `todo()` steps,
-- a guide in `workshop/exercises/`, where every step ends on a checkpoint and keeps its skeleton and solution behind collapsible reveals,
+- a short guide in `workshop/exercises/`, with every step's skeleton and solution behind collapsible reveals,
 - the finished code in `workshop/solutions/<id>/`,
 - an automatic check: `pnpm lab:check <id>`.
 

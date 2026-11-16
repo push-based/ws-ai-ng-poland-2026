@@ -272,7 +272,7 @@ test('Step 5 · an agent submits: respondWith() carries the result, also for inv
   );
   assert.ok(
     !rejected.ok && /seat/i.test(rejected.error),
-    'pass the readReservation() error message to the agent',
+    'pass the readReservation() error message to the agent; the seats error should mention "seats"',
   );
   assert.deepEqual(
     await invalid.record.responses[0],

@@ -228,7 +228,7 @@ test('Step 3 · createSummarizer reports a clear error when the API is missing o
       createSummarizer(options),
       (error: Error) =>
         !(error instanceof ReferenceError) && /not/i.test(error.message),
-      'throw a readable Error when the Summarizer is "missing" (not a ReferenceError)',
+      'throw a readable Error when the Summarizer is "missing" (not a ReferenceError); its message should say that the API is "not exposed"',
     ),
   );
 });

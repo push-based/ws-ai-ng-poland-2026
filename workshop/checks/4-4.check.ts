@@ -127,7 +127,7 @@ test('Step 3 · watchlistTools() describes three tools with honest hints and sch
   for (const t of tools) {
     assert.ok(
       t.description.length > 15,
-      `give ${t.name} a description an agent can choose by`,
+      `give ${t.name} a description an agent can choose by: one full sentence (more than 15 characters)`,
     );
     assert.equal(
       t.inputSchema['type'],

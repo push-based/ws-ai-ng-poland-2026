@@ -1,36 +1,29 @@
 # Exercise 4.3: Declarative WebMCP
 
-In exercises 4.1 and 4.2 the tools lived in a separate server process that a desktop host started. WebMCP puts tools inside the web page: an agent that works in the browser calls them in the user's open tab, with the user's session and the page's live state. In this exercise we will turn a normal seat-reservation form into a WebMCP tool with a few HTML attributes, validate what is submitted, and send the result back to the agent.
+WebMCP puts tools inside the web page, where a browser agent calls them in the user's open tab. Turn a seat-reservation form into a tool with a few HTML attributes, validate what is submitted, and answer the agent.
 
-**Page:** http://127.0.0.1:4200/lab/4-3 · **You edit:** `apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.html` and `exercise.ts` · **Check:** `pnpm lab:check 4-3` · **Time:** ~20 min · **Level:** core
+- **Page:** http://127.0.0.1:4200/lab/4-3
+- **You edit:** `apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.html` and `exercise.ts`
+- **Check:** `pnpm lab:check 4-3`
+- **Time:** ~20 min
+- **Level:** core
 
-## Goal
+> **Tip:** The badge in section **A** says **No WebMCP**? Enable `chrome://flags/#enable-webmcp-testing` and relaunch Chrome, or turn on **Use simulated browser AI**. Setup is in the [workshop README](../README.md#1--one-time-setup-do-this-before-the-workshop).
 
-At the end of this exercise **Valid request** fills in and submits the form as an agent would, and section **C** shows **Agent received** with a reservation code such as `NC-001`.
+Steps 1–3 are in `exercise.html`, Steps 4–5 in `exercise.ts`.
 
-## 0. Setup
-
-Start the app as described in the [workshop README](../README.md#1--one-time-setup-do-this-before-the-workshop), then open http://127.0.0.1:4200/lab/4-3 in Chrome. Look at the badge in section **A**:
-
-- **Native WebMCP**: your Chrome exposes `document.modelContext` (the flag `chrome://flags/#enable-webmcp-testing` is on). Keep the simulation switch off.
-- **No WebMCP**: enable that flag and relaunch Chrome, or turn on **Use simulated browser AI** at the top. The badge then says **Simulated WebMCP**: a small stand-in for `document.modelContext` that reads declarative forms the same way, so everything in this exercise works with it.
-
-WebMCP is an experimental proposal. Open both exercise files: `exercise.html` is the form you see in section **A**, with `<!-- TODO Step n -->` comments for Steps 1–3. `exercise.ts` has two functions with `return todo(...)` lines for Steps 4–5.
-
-> [!NOTE]
-> The form already has `novalidate`, on purpose. The browser's built-in checks (`min`, `max`, `required`) would silently block an invalid submission, and the agent would get no explanation. We validate in code instead (Step 4) and return a readable error.
+The form already has `novalidate`. Browser validation would block an invalid agent submit without telling the agent why, so we validate in code (Step 4).
 
 ## 1. Name the tool
 
-Two attributes on a `<form>` turn it into a tool. `toolname` is the name an agent calls, like a function name; we use `reserve_seats`. `tooldescription` says in one or two sentences what the tool does and what it returns. An agent chooses tools by reading this text, so make it specific. The fields' `name` attributes become the tool's parameters.
+Two attributes turn a `<form>` into a tool. The fields' `name` attributes become its parameters.
 
-In `exercise.html`, add `toolname="reserve_seats"` and a `tooldescription` to the opening `<form>` tag, before `novalidate`, and delete the Step 1 TODO comment. Leave the Step 3 comment for later.
+On the `<form>` tag, add `toolname="reserve_seats"` and a `tooldescription` of at least one full sentence that says what the tool does and returns.
 
-> [!TIP]
-> Use plain attributes: `toolname="…"`. Angular passes them straight to the DOM, with no import and no special syntax. A binding such as `[toolname]="…"` makes Angular look for a property of that name and fail with an unknown-property error.
+Write plain attributes, not Angular bindings like `[toolname]`.
 
 <details>
-  <summary>toolname and tooldescription solution</summary>
+  <summary>Solution: toolname and tooldescription</summary>
 
 ```html
 <!-- apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.html -->
@@ -39,24 +32,20 @@ In `exercise.html`, add `toolname="reserve_seats"` and a `tooldescription` to th
   tooldescription="Reserve seats for one Nano Cinema screening: choose the film, the number of seats (1 to 6) and the showtime. Returns a reservation code."
 ```
 
-The rest of the tag, `novalidate (submit)="submitted.emit($event)">`, stays as it is.
-
 </details>
 
-Save. In section **B**, click **Discover tools**. You see `reserve_seats`, your description and an input schema with three properties: `movieId`, `seats` and `showtime`. The browser built this schema from your HTML:
+### Try it
 
-- each `<select>` → `"type": "string"` with an `enum` of its `<option>` values. Chrome's real schema may also add the option texts as titles.
-- `<input type="number" min="1" max="6">` → `"type": "number"` with `minimum` and `maximum` (in the simulation; your Chrome version may express this differently).
-- `required` fields → the schema's `required` list.
+1. In section **B**, click **Discover tools**.
+   - You see `reserve_seats` and a schema with `movieId`, `seats` and `showtime`.
+   - The browser built it from your HTML.
 
 ## 2. Describe every parameter
 
-The agent also needs to know what each field means and which values are allowed. Without help, the browser falls back to the field's `<label>` ("Film", "Seats (1–6)"), and without a label to `aria-description`, which is often too short. `toolparamdescription="…"` on a field becomes that parameter's `description` in the schema. It is only for agents; people still read the label.
-
-In `exercise.html`, add a `toolparamdescription` to each of the three fields, `<select name="movieId">`, `<input name="seats">` and `<select name="showtime">`, and delete the three Step 2 TODO comments. Name the allowed values in each description.
+Add a `toolparamdescription` to each of the three fields. Name the allowed values in each.
 
 <details>
-  <summary>toolparamdescription attributes solution</summary>
+  <summary>Solution: toolparamdescription attributes</summary>
 
 ```html
 <!-- apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.html -->
@@ -105,16 +94,19 @@ In `exercise.html`, add a `toolparamdescription` to each of the three fields, `<
 
 </details>
 
-Save and click **Discover tools** again. Each property in the schema now has your `description`.
+### Try it
+
+1. Click **Discover tools** again.
+   - Each property now has your `description`.
 
 ## 3. Decide who presses Submit
 
-When an agent invokes a declarative tool, the browser fills in the fields. Then there are two options. Without `toolautosubmit`, the form stays filled in and a person must press **Reserve seats** while the agent waits: the safer choice for actions with consequences (payments, messages, deletions), because a human confirms. With `toolautosubmit`, the browser submits the form for the agent right away. We choose `toolautosubmit` here, so the demo runs end to end; the stretch goals try the other choice.
+Without `toolautosubmit`, the agent fills in the form and a person must press the button. That is the safer choice for payments and deletions. With it, the browser submits for the agent.
 
-Add `toolautosubmit` to the `<form>` tag, before `novalidate`, and delete the Step 3 TODO comment.
+Add `toolautosubmit` to the `<form>` tag.
 
 <details>
-  <summary>toolautosubmit solution</summary>
+  <summary>Solution: toolautosubmit</summary>
 
 ```html
 <!-- apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.html -->
@@ -129,19 +121,26 @@ Add `toolautosubmit` to the `<form>` tag, before `novalidate`, and delete the St
 
 </details>
 
-Save. In section **C**, click **Valid request** and watch the form: the fields change to _Elephants Dream_, _2_ and _20:30_, and the form is submitted. The Event log shows `handleReservationSubmit() · submitted by an agent` with a 🧩 hint, because Step 5 isn't done yet. The page also tells you that it called `preventDefault()` for you, so the browser did not reload.
+### Try it
+
+1. In section **C**, click **Valid request**.
+   - The fields change and the form is submitted.
+   - The log shows a 🧩 hint for Step 5.
 
 ## 4. Validate the submitted values
 
-`min="1" max="6"` and the `<option>` list are hints, for people and for agents. They are not a security boundary: an agent with a mistake, a script or the DevTools console can submit any value. The code that acts on the data checks it, and throws an `Error` whose message explains what is wrong. The agent forwards that message, so the user learns what to change.
+`min`, `max` and the option list are hints. Any caller can submit any value, so the code checks.
 
-In `readReservation()` in `exercise.ts`, read `movieId`, `seats` and `showtime` from `data`. Throw an `Error` when the film is not in `movies`, when seats is not a whole number from 1 to `maxSeats`, or when the showtime is not in `showtimes`. Otherwise return the three values.
+In `readReservation()` in `exercise.ts`, read `movieId`, `seats` and `showtime` from `data`. Throw an `Error` with a clear message when:
 
-> [!TIP]
-> `FormData` gives every value as a string, or `null` when the field is missing. Convert seats with `Number(data.get('seats'))` before you compare it.
+- the film is not in `movies`
+- seats is not a whole number from 1 to `maxSeats` (convert with `Number()` first). The message must contain the word "seats".
+- the showtime is not in `showtimes`
+
+Otherwise return the three values.
 
 <details>
-  <summary>readReservation() skeleton</summary>
+  <summary>Hint · skeleton: <code>readReservation()</code></summary>
 
 ```ts
 // apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.ts
@@ -162,7 +161,7 @@ export function readReservation(data: FormData): Reservation {
 </details>
 
 <details>
-  <summary>readReservation() solution</summary>
+  <summary>Solution: <code>readReservation()</code></summary>
 
 ```ts
 // apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.ts
@@ -184,28 +183,21 @@ export function readReservation(data: FormData): Reservation {
 }
 ```
 
-| Code                      | Meaning                                                                                     |
-| ------------------------- | ------------------------------------------------------------------------------------------- |
-| `data.get('seats')`       | The value of the field with `name="seats"`, as text: `"2"`. `null` if the field is missing. |
-| `Number(...)`             | `"2"` → `2`, `"two"` → `NaN`, `""` → `0`. All bad values fail the next check.               |
-| `Number.isInteger(seats)` | Rejects `NaN` and half seats such as `1.5`.                                                 |
-| `showtime as Showtime`    | Tells TypeScript the string is one of the three showtimes, after we checked it.             |
-
 </details>
-
-Save and run `pnpm lab:check 4-3` in a second terminal. The `Step 4 · readReservation() returns a valid reservation and rejects bad values` line turns ✔. The page calls this function from Step 5.
 
 ## 5. Answer the agent with `respondWith()`
 
-People and agents both end up in the form's `submit` event. WebMCP adds two members to it: `event.agentInvoked` is `true` when an agent submitted the form, and `event.respondWith(promise)` hands the agent its tool result. A person's submit has no `respondWith`, so we call it only for agents.
+On an agent's submit, `event.agentInvoked` is `true` and `event.respondWith(promise)` hands the agent its result.
 
-In `handleReservationSubmit()`, call `event.preventDefault()` first, so the browser doesn't navigate away and lose the agent's result. Then read the form with `new FormData(form)`, validate it with `readReservation()` and store it with `reservations.add()`. Turn an error from Step 4 into `{ ok: false, error }` instead of throwing it, so that a person or an agent gets an answer either way. Finally, when `agentInvoked` is true, pass the result to `respondWith()`, and return it.
+In `handleReservationSubmit()`:
 
-> [!WARNING]
-> Call `respondWith()` during the submit handler, after `preventDefault()`. A call made later, for example in a `setTimeout`, leaves the agent with `null` as its result.
+- Call `event.preventDefault()` first.
+- Read the form with `new FormData(form)`, validate with `readReservation()` and store with `reservations.add()`. On success the result is `{ ok: true, reservation, message }`, with a confirmation sentence that contains the code.
+- Turn an error into `{ ok: false, error }`. Do not throw it.
+- Cast the event to `AgentSubmitEvent`. When `agentInvoked` is true, call `respondWith(Promise.resolve(result))`. Return the result.
 
 <details>
-  <summary>handleReservationSubmit() skeleton</summary>
+  <summary>Hint · skeleton: <code>handleReservationSubmit()</code></summary>
 
 ```ts
 // apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.ts
@@ -234,7 +226,7 @@ export function handleReservationSubmit(
 </details>
 
 <details>
-  <summary>handleReservationSubmit() solution</summary>
+  <summary>Solution: <code>handleReservationSubmit()</code></summary>
 
 ```ts
 // apps/movie-theater/src/app/lab/exercises/4-3-declarative-webmcp/exercise.ts
@@ -273,66 +265,47 @@ export function handleReservationSubmit(
 }
 ```
 
-Why `respondWith?.(...)`? `AgentSubmitEvent`, defined in the file, marks both new members as optional, because a normal `SubmitEvent` doesn't have them. `?.` calls the method only when it exists.
-
 </details>
 
-Save, let the page reload, and try it:
+### Try it
 
-1. In section **C**, click **Valid request**. Section **C** shows **Agent received** with `"ok": true` and a message like `Reserved 2 seat(s) for Elephants Dream at 20:30. Code NC-001.`, and the reservation appears in the table in section **A**.
-2. Click **Too many seats**. The agent receives `"ok": false` and `"error": "Seats must be a whole number from 1 to 6."`, and nothing is stored. In the simulation this request always reaches your handler. Chrome may refuse 9 seats earlier, because the schema says `maximum: 6`. Either way your code is the last line of defence.
-3. Press **Reserve seats** yourself. The log says `submitted by a person`, and no `respondWith()` is called.
+1. Click **Valid request**.
+   - Section **C** shows **Agent received** with a code such as `NC-001`.
+2. Click **Too many seats**.
+   - The agent receives `"ok": false` and your message.
+   - Native Chrome may refuse 9 seats before your code runs.
+3. Press **Reserve seats** yourself.
+   - The log says `submitted by a person`.
 
-Well done! The same form now serves people and agents.
+---
 
 ## Check your work
-
-In a second terminal (keep the app running in the first), run:
 
 ```sh
 pnpm lab:check 4-3
 ```
 
-Expected result:
+All 6 checks should pass.
 
-```
-  ✔ Step 1 · the <form> is a WebMCP tool: toolname="reserve_seats" + tooldescription
-  ✔ Step 2 · every field explains itself with toolparamdescription
-  ✔ Step 3 · toolautosubmit lets an agent submit the form
-  ✔ Step 4 · readReservation() returns a valid reservation and rejects bad values
-  ✔ Step 5 · a person submits: preventDefault, store, return the result, no respondWith
-  ✔ Step 5 · an agent submits: respondWith() carries the result, also for invalid input
+Stuck?
 
-  6 passed, 0 failed
-```
+- `pnpm lab:solve 4-3` puts the solution in place and keeps your files as `*.mine`.
+- `pnpm lab:reset 4-3` restores the starters.
 
-The check reads `exercise.html` as text to find your attributes, and runs Steps 4–5 in Node with a fake submit event. It does not start a browser or an agent.
+| You see                                            | What to do                                                           |
+| -------------------------------------------------- | -------------------------------------------------------------------- |
+| `No tool named reserve_seats yet`                  | Put both Step 1 attributes on the `<form>` itself.                   |
+| `The page called preventDefault() for you…`        | Make `event.preventDefault()` the first line of Step 5.              |
+| "Waiting for a person to press Reserve seats…"     | Add `toolautosubmit` to the form (Step 3), or press the button.      |
+| Agent receives `null`                              | Call `respondWith` during the submit handler, not in a `setTimeout`. |
+| `Seats must be a whole number…` for a valid number | Convert first: `Number(data.get('seats'))`.                          |
+| Angular error about an unknown property            | Write `toolname="…"`, not `[toolname]="…"`.                          |
 
-To call the tool from DevTools, copy the snippet in section **D** into the Console: it runs `getTools()`, then `executeTool(reserve, { movieId: 'bunny', seats: 3, showtime: '18:00' })`, both on `document.modelContext`, so it works with native WebMCP and with the simulation.
+More help: [general troubleshooting](../README.md#5--general-troubleshooting).
 
-### Troubleshooting
+> **Note:** In the cinema app: the search form in `features/discover/discover.html` uses the same attributes.
 
-| You see                                                   | What to do                                                                                                      |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| 🧩 `Not implemented yet: exercise 4-3, Step N` in the log | That function still calls `todo(...)`. Replace the whole line, then save.                                       |
-| `No tool named reserve_seats yet`                         | Put both Step 1 attributes on the `<form>` itself, and spell the name `reserve_seats`.                          |
-| `document.modelContext is missing`                        | Turn on **Use simulated browser AI**, or enable `chrome://flags/#enable-webmcp-testing` and relaunch Chrome.    |
-| `The page called preventDefault() for you…`               | Make `event.preventDefault()` the first line of Step 5, before anything that can throw.                         |
-| "Waiting for a person to press Reserve seats…"            | This is the human-confirmation mode: press the button, or add `toolautosubmit` to the form (Step 3).            |
-| Agent receives `null`                                     | Check `agentEvent.agentInvoked`, and call `respondWith` during the submit handler, not later in a `setTimeout`. |
-| `Seats must be a whole number…` for a valid number        | Convert first: `Number(data.get('seats'))`, then compare.                                                       |
-| Angular error about an unknown property                   | Write the plain attribute `toolname="…"` instead of the binding `[toolname]="…"`.                               |
+## Bonus
 
-Still stuck? `pnpm lab:solve 4-3` copies the reference solution into place and saves your files as `exercise.html.mine` and `exercise.ts.mine`. `pnpm lab:reset 4-3` brings back the starter files.
-
-> [!NOTE]
-> The cinema app uses the same attributes. `apps/movie-theater/src/app/features/discover/discover.html` is the catalogue search form with `toolname`, `tooldescription` and `toolparamdescription`; it performs a search, so it needs no `respondWith()`. `apps/movie-theater/src/app/core/webmcp/` holds the cinema's imperative tools (exercise 4.4), registered from JavaScript for actions that are not forms, such as the audio mixer. `declarativeForms()` in `apps/movie-theater/src/app/lab/shared/simulated-ai.ts` shows how the lab's simulation turns your form into a schema, a simplified model of what Chrome does.
-
-## 6. BONUS: Stretch goals
-
-> [!NOTE]
-> This is a bonus exercise, you don't need to complete it.
-
-- Remove `toolautosubmit` and click **Valid request** again. The agent fills in the form and waits until you press **Reserve seats**. When would you want that? (Hint: anything that costs money.)
-- Style the form while an agent is using it. Chrome's documentation describes the pseudo-classes `:tool-form-active` (on the form) and `:tool-submit-active` (on the submit button). They apply only in a Chrome build with WebMCP; the simulation does not set them.
-- Listen for the `toolactivated` and `toolcancel` events on `document.modelContext` (the page already logs them in native mode) and show an "An assistant is filling this form" banner.
+- Remove `toolautosubmit` and click **Valid request** again. When would you want that?
+- Call the tool from DevTools with the snippet in section **D**.
